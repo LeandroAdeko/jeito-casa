@@ -1,0 +1,117 @@
+.meal-organizer {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.organizer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+/* Dynamic Days Layout */
+.days-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 350px));
+  gap: 20px;
+  justify-content: start;
+}
+
+
+
+.btn-add-day {
+  min-width: 280px;
+  max-width: 350px;
+  height: 100px;
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-add-day:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: var(--hover-bg);
+}
+
+.selected-recipe {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.btn-remove-meal {
+  background: none;
+  border: none;
+  color: #d32f2f;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0 5px;
+  line-height: 1;
+}
+
+.shopping-list-section {
+  margin-top: 30px;
+}
+
+.shopping-list-markdown {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  font-family: 'Courier New', Courier, monospace;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.markdown-line {
+  display: flex;
+  gap: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+  color: var(--text-color);
+}
+
+.markdown-line:hover {
+  background-color: var(--hover-bg);
+}
+
+.markdown-line.checked {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.md-checkbox {
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.md-content {
+  flex: 1;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
