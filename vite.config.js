@@ -7,5 +7,17 @@ export default defineConfig({
   base: '/jeito-casa/',
   esbuild: {
     loader: 'jsx',
+  },
+  resolve: {
+    alias: {
+      '.runtimeConfig': './runtimeConfig.browser',
+    }
+  },
+  optimizeDeps: {
+   esbuildOptions: {
+    loader: {
+      '.js': 'jsx',
+    },
+   } 
   }
 })
