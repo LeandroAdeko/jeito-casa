@@ -71,10 +71,10 @@ Uma aplicação web moderna para organização doméstica, desenvolvida com Reac
 
 ```bash
 # Clone o repositório
-git clone https://github.com/LeandroAdeko/jeito-de-casa.git
+git clone https://github.com/LeandroAdeko/jeito-casa.git
 
 # Entre no diretório
-cd jeito-de-casa
+cd jeito-casa
 
 # Instale as dependências
 npm install
@@ -88,7 +88,7 @@ O projeto estará disponível em `http://localhost:5173`
 ## 📁 Estrutura do Projeto
 
 ```
-jeito-de-casa/
+jeito-casa/
 ├── src/
 │   ├── components/       # Componentes reutilizáveis
 │   │   ├── CopyButton.jsx
