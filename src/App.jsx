@@ -8,7 +8,7 @@ import MealOrganizer from './pages/MealOrganizer';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/jeito-casa">
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
