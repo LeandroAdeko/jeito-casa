@@ -1,25 +1,52 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import ShoppingList from './pages/ShoppingList';
 import BillSplitter from './pages/BillSplitter';
 import RecipeCreator from './pages/RecipeCreator';
 import MealOrganizer from './pages/MealOrganizer';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
 function App() {
   return (
-    <BrowserRouter basename="/jeito-casa">
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="lista-compras" element={<ShoppingList />} />
-          <Route path="dividir-contas" element={<BillSplitter />} />
-          <Route path="receitas" element={<RecipeCreator />} />
-          <Route path="refeicoes" element={<MealOrganizer />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter basename="/jeito-casa">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Layout with Sidebar */}
+          <Route path="/" element={<Layout />}>
+            {/* Public Home */}
+            <Route index element={<Home />} />
+            
+            {/* Public Tools - accessible without login */}
+            <Route path="lista-compras" element={<ShoppingList />} />
+            <Route path="dividir-contas" element={<BillSplitter />} />
+            <Route path="receitas" element={<RecipeCreator />} />
+            <Route path="refeicoes" element={<MealOrganizer />} />
+            
+            {/* Protected Routes - require login */}
+            <Route path="dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+          </Route>
+
+          {/* Catch all - redirect to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
 export default App;
+
+

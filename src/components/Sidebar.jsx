@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import SidebarIcon from './SidebarIcon';
 import { TOOLS } from '../config/tools';
+import { useAuth } from '../contexts/AuthContext';
 import '../styles/layout.css';
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [theme, setTheme] = useState('light');
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -16,6 +19,15 @@ const Sidebar = () => {
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
   };
 
   const navItems = [
@@ -37,6 +49,30 @@ const Sidebar = () => {
             </button>
         </div>
       </div>
+
+      {/* User Profile Section */}
+      {currentUser && (
+        <div className="user-profile">
+          <div className="user-avatar">
+            {currentUser.photoURL ? (
+              <img src={currentUser.photoURL} alt="User" />
+            ) : (
+              <div className="avatar-placeholder">
+                {currentUser.displayName?.charAt(0) || currentUser.email?.charAt(0) || '👤'}
+              </div>
+            )}
+          </div>
+          {!isCollapsed && (
+            <div className="user-info">
+              <div className="user-name">
+                {currentUser.displayName || 'Usuário'}
+              </div>
+              <div className="user-email">{currentUser.email}</div>
+            </div>
+          )}
+        </div>
+      )}
+
       <nav>
         <ul className="nav-list">
           {navItems.map((item) => (
@@ -53,13 +89,33 @@ const Sidebar = () => {
           ))}
         </ul>
       </nav>
+
       <div className="sidebar-footer">
         <button className="toggle-btn theme-toggle" onClick={toggleTheme}>
           {theme === 'light' ? '🌙' : '☀️'}
         </button>
+        {currentUser ? (
+          <button 
+            className="toggle-btn logout-btn" 
+            onClick={handleLogout}
+            title="Sair"
+          >
+            🚪
+          </button>
+        ) : (
+          <button 
+            className="toggle-btn login-btn" 
+            onClick={() => navigate('/login')}
+            title="Entrar"
+          >
+            🔑
+          </button>
+        )}
       </div>
     </aside>
   );
 };
 
 export default Sidebar;
+
+

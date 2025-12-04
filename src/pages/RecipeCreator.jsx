@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import CopyButton from '../components/CopyButton';
 import SectionCard from '../components/SectionCard';
 import DownloadJsonButton from '../components/DownloadJsonButton';
+import LoginPrompt from '../components/LoginPrompt';
 import FileUpload from '../components/FileUpload';
 import '../styles/global.css';
 import '../styles/recipe-creator.css';
@@ -107,6 +108,8 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
           </>
         }
       />
+
+      <LoginPrompt />
 
       <SectionCard title="Informações Básicas">
         <div className="basic-info-grid">

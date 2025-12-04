@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CopyButton from '../components/CopyButton';
 import SectionCard from '../components/SectionCard';
 import FileUpload from '../components/FileUpload';
+import LoginPrompt from '../components/LoginPrompt';
 import DayCard from '../components/DayCard';
 import '../styles/global.css';
 import '../styles/meal-organizer.css';
@@ -176,6 +177,8 @@ const MealOrganizer = () => {
           </div>
         }
       />
+
+      <LoginPrompt />
 
       <SectionCard title="Planejamento de Dias">
         <div className="days-container">

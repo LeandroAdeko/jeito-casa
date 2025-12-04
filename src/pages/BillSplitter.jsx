@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import FileUpload from '../components/FileUpload';
 import DownloadJsonButton from '../components/DownloadJsonButton';
 import SectionCard from '../components/SectionCard';
+import LoginPrompt from '../components/LoginPrompt';
 import '../styles/global.css';
 import '../styles/bill-splitter.css';
 
@@ -239,6 +240,8 @@ const BillSplitter = () => {
           </>
         }
       />
+
+      <LoginPrompt />
 
       <SectionCard title="Configurações da Casa" className="config-section">
         <div className="config-row">
