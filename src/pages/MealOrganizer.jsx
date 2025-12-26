@@ -4,8 +4,10 @@ import { CopyButton, FileUpload } from '../components/Button';
 import MarkdownPreview from '../components/MarkdownPreview';
 import LoginPrompt from '../components/LoginPrompt';
 import DayCard from '../components/DayCard';
+import RecipeModal from '../components/RecipeModal';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useAuth } from '../contexts/AuthContext';
+import { useRecipes } from '../hooks/useRecipes';
 import '../styles/global.css';
 import '../styles/meal-organizer.css';
 
@@ -14,9 +16,25 @@ const MealOrganizer = () => {
   const { currentUser } = useAuth();
   
   // Usa localStorage para persistir dados automaticamente
-  // TODO: Sincronizar com Firebase quando usuário estiver logado
-  const [availableRecipes, setAvailableRecipes] = useLocalStorage('mealOrganizer_recipes', []);
+  const [localRecipes, setLocalRecipes] = useLocalStorage('mealOrganizer_recipes', []);
   const [peopleCount, setPeopleCount] = useLocalStorage('mealOrganizer_peopleCount', 1);
+  
+  // Receitas do Firestore (usuário + públicas)
+  const { recipes: firestoreRecipes, loading: recipesLoading } = useRecipes(currentUser, { includePublic: true });
+
+  // Combina receitas locais (JSON) com receitas do Firestore
+  const availableRecipes = React.useMemo(() => {
+    const combined = [...firestoreRecipes];
+    
+    // Adiciona receitas locais que não estão no Firestore (pelo título)
+    localRecipes.forEach(local => {
+      if (!combined.some(f => f.title === local.title)) {
+        combined.push(local);
+      }
+    });
+    
+    return combined;
+  }, [firestoreRecipes, localRecipes]);
   
   // Dynamic days state: array of objects { id, name, meals: [] }
   const [days, setDays] = useLocalStorage('mealOrganizer_days', [
@@ -25,6 +43,15 @@ const MealOrganizer = () => {
 
   const [shoppingList, setShoppingList] = useState([]);
   const [portionSuggestions, setPortionSuggestions] = useState({});
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+
+  const handleRecipeClick = (recipe) => {
+    setSelectedRecipe(recipe);
+  };
+
+  const closeRecipeModal = () => {
+    setSelectedRecipe(null);
+  };
 
   const handleLoadRecipes = (e) => {
     const files = Array.from(e.target.files);
@@ -34,7 +61,7 @@ const MealOrganizer = () => {
       reader.onload = (event) => {
         try {
           const json = JSON.parse(event.target.result);
-          setAvailableRecipes(prev => {
+          setLocalRecipes(prev => {
             if (prev.some(r => r.title === json.title)) return prev;
             return [...prev, json];
           });
@@ -199,6 +226,7 @@ const MealOrganizer = () => {
               onRemove={removeDay}
               onAddRecipe={addRecipeToDay}
               onRemoveRecipe={removeRecipeFromDay}
+              onRecipeClick={handleRecipeClick}
             />
           ))}
           
@@ -268,6 +296,12 @@ const MealOrganizer = () => {
           />
         )}
       </SectionCard>
+
+      <RecipeModal 
+        isOpen={!!selectedRecipe} 
+        onClose={closeRecipeModal} 
+        recipe={selectedRecipe} 
+      />
     </div>
   );
 };

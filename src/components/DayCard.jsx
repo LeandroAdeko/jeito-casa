@@ -63,6 +63,25 @@ const SelectedRecipe = styled.div`
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--primary-color);
+    background-color: var(--bg-color);
+  }
+`;
+
+const RecipeTitle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+`;
+
+const SearchIcon = styled.span`
+  font-size: 0.8rem;
+  opacity: 0.6;
 `;
 
 const RemoveMealButton = styled.button`
@@ -73,6 +92,11 @@ const RemoveMealButton = styled.button`
   font-size: 1.1rem;
   padding: 0 5px;
   line-height: 1;
+  margin-left: 8px;
+
+  &:hover {
+    color: #b71c1c;
+  }
 `;
 
 const AddMealSelect = styled.select`
@@ -91,7 +115,7 @@ const AddMealSelect = styled.select`
   }
 `;
 
-const DayCard = ({ day, dayIndex, availableRecipes, onUpdateName, onRemove, onAddRecipe, onRemoveRecipe }) => {
+const DayCard = ({ day, dayIndex, availableRecipes, onUpdateName, onRemove, onAddRecipe, onRemoveRecipe, onRecipeClick }) => {
   return (
     <Card>
       <HeaderRow>
@@ -105,9 +129,15 @@ const DayCard = ({ day, dayIndex, availableRecipes, onUpdateName, onRemove, onAd
       
       <MealsContainer>
         {day.meals.map((recipe, mealIndex) => (
-          <SelectedRecipe key={mealIndex}>
-            <span>{recipe.title}</span>
-            <RemoveMealButton onClick={() => onRemoveRecipe(dayIndex, mealIndex)}>
+          <SelectedRecipe key={mealIndex} onClick={() => onRecipeClick(recipe)}>
+            <RecipeTitle>
+              <span>{recipe.title}</span>
+              <SearchIcon>🔍</SearchIcon>
+            </RecipeTitle>
+            <RemoveMealButton onClick={(e) => {
+              e.stopPropagation();
+              onRemoveRecipe(dayIndex, mealIndex);
+            }}>
               ×
             </RemoveMealButton>
           </SelectedRecipe>

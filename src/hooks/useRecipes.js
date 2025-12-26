@@ -7,6 +7,7 @@ import {
   doc, 
   query, 
   where, 
+  or,
   onSnapshot,
   serverTimestamp 
 } from 'firebase/firestore';
@@ -15,9 +16,11 @@ import { db } from '../config/firebaseConfig';
 /**
  * Hook para gerenciar CRUD de receitas no Firestore
  * @param {Object} currentUser - Usuário autenticado do useAuth
+ * @param {Object} options - Opções de busca { includePublic: boolean }
  * @returns {Object} - { recipes, addRecipe, updateRecipe, deleteRecipe, loading, error }
  */
-export function useRecipes(currentUser) {
+export function useRecipes(currentUser, options = { includePublic: false }) {
+  const { includePublic = false } = options;
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,11 +36,36 @@ export function useRecipes(currentUser) {
     setLoading(true);
     setError(null);
 
-    // Query para buscar apenas receitas do usuário atual
-    const q = query(
-      collection(db, 'recipes'),
-      where('userId', '==', currentUser.uid)
-    );
+    // Query para buscar receitas
+    let q;
+    if (currentUser) {
+      if (includePublic) {
+        // Usuário logado + Públicas
+        q = query(
+          collection(db, 'recipes'),
+          or(
+            where('userId', '==', currentUser.uid), 
+            where('userId', '==', null),
+            where('userId', '==', '')
+          )
+        );
+      } else {
+        // Apenas do usuário logado
+        q = query(
+          collection(db, 'recipes'),
+          where('userId', '==', currentUser.uid)
+        );
+      }
+    } else {
+      // Apenas públicas (sempre incluídas se não houver usuário)
+      q = query(
+        collection(db, 'recipes'),
+        or(
+          where('userId', '==', null),
+          where('userId', '==', '')
+        )
+      );
+    }
 
     // Listener em tempo real
     const unsubscribe = onSnapshot(

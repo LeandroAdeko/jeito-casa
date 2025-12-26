@@ -22,6 +22,11 @@ service cloud.firestore {
     function willBeOwner() {
       return isAuthenticated() && request.resource.data.userId == request.auth.uid;
     }
+
+    // Função helper para verificar se o dado é público
+    function isPublic(data) {
+      return !('userId' in data) || data.userId == "" || data.userId == null;
+    }
     
     // Regras para coleção users (dados de perfil)
     match /users/{userId} {
@@ -52,18 +57,15 @@ service cloud.firestore {
     
     // Regras para coleção recipes (CRUD de receitas com IDs aleatórios)
     match /recipes/{recipeId} {
-      allow read, update, delete: if isDataOwner();
+      allow read: if isPublic(resource.data) || isDataOwner();
+      allow update, delete: if isDataOwner();
       allow create: if willBeOwner();
     }
 
     // Regras para coleção ingredients
     match /ingredients/{ingredientId} {
-      // Usuários podem ler seus próprios ingredientes ou ingredientes públicos (sem userId)
-      allow read: if isAuthenticated() && (
-        !('userId' in resource.data) || 
-        resource.data.userId == null || 
-        resource.data.userId == request.auth.uid
-      );
+      // Usuários podem ler seus próprios ingredientes ou ingredientes públicos
+      allow read: if isPublic(resource.data) || isDataOwner();
       
       // Apenas o dono pode criar, atualizar ou deletar
       allow create: if willBeOwner();
