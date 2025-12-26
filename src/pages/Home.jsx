@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import styled from 'styled-components';
+import { Button } from '../components/Button';
 import { TOOLS } from '../config/tools';
 
 const HomeContainer = styled.div`
@@ -47,39 +48,6 @@ const AuthButtons = styled.div`
   flex-wrap: wrap;
 `;
 
-const Button = styled(Link)`
-  padding: 14px 32px;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  display: inline-block;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  }
-`;
-
-const PrimaryButton = styled(Button)`
-  background: white;
-  color: var(--primary-color);
-
-  &:hover {
-    background: #f0f0f0;
-  }
-`;
-
-const SecondaryButton = styled(Button)`
-  background: transparent;
-  color: white;
-  border: 2px solid white;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-`;
 
 const UserGreeting = styled.div`
   background: rgba(255, 255, 255, 0.2);
@@ -135,21 +103,6 @@ const ToolDescription = styled.p`
   line-height: 1.6;
 `;
 
-const ToolButton = styled(Link)`
-  display: inline-block;
-  padding: 10px 24px;
-  background: var(--primary-color);
-  color: white;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateX(5px);
-    box-shadow: 0 4px 12px rgba(100, 108, 255, 0.3);
-  }
-`;
 
 const BenefitsSection = styled.div`
   background: var(--card-bg);
@@ -230,8 +183,8 @@ const Home = () => {
           </UserGreeting>
         ) : (
           <AuthButtons>
-            <PrimaryButton to="/login">Entrar</PrimaryButton>
-            <SecondaryButton to="/register">Criar Conta</SecondaryButton>
+            <Button as={Link} to="/login" style={{ background: 'white', color: 'var(--primary-color)' }} size="large">Entrar</Button>
+            <Button as={Link} to="/register" variant="outline" style={{ borderColor: 'white', color: 'white' }} size="large">Criar Conta</Button>
           </AuthButtons>
         )}
       </HeroSection>
@@ -243,9 +196,9 @@ const Home = () => {
             <ToolIcon>{tool.icon}</ToolIcon>
             <ToolTitle>{tool.title}</ToolTitle>
             <ToolDescription>{tool.description}</ToolDescription>
-            <ToolButton to={tool.path}>
-              Acessar Ferramenta →
-            </ToolButton>
+            <Button as={Link} to={tool.path} rightIcon="→">
+              Acessar Ferramenta
+            </Button>
           </ToolCard>
         ))}
       </ToolsGrid>
@@ -286,9 +239,9 @@ const Home = () => {
             <CTATitle>Pronto para começar?</CTATitle>
             <CTAText>Crie sua conta gratuitamente e aproveite todos os benefícios!</CTAText>
             <AuthButtons>
-              <PrimaryButton to="/register" style={{ background: 'var(--primary-color)', color: 'white' }}>
+              <Button as={Link} to="/register" size="large" fullWidth>
                 Criar Conta Grátis
-              </PrimaryButton>
+              </Button>
             </AuthButtons>
           </CTASection>
         </>

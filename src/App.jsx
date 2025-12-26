@@ -6,7 +6,8 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import ShoppingList from './pages/ShoppingList';
 import BillSplitter from './pages/BillSplitter';
-import RecipeCreator from './pages/RecipeCreator';
+import RecipeList from './pages/RecipeList';
+import RecipeForm from './pages/RecipeForm';
 import MealOrganizer from './pages/MealOrganizer';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -28,7 +29,9 @@ function App() {
             {/* Public Tools - accessible without login */}
             <Route path="lista-compras" element={<ShoppingList />} />
             <Route path="dividir-contas" element={<BillSplitter />} />
-            <Route path="receitas" element={<RecipeCreator />} />
+            <Route path="recipes" element={<RecipeList />} />
+            <Route path="recipe-form" element={<RecipeForm />} />
+            <Route path="recipe-form/:recipeId" element={<RecipeForm />} />
             <Route path="refeicoes" element={<MealOrganizer />} />
             
             {/* Protected Routes - require login */}

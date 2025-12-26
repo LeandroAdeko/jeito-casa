@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import CopyButton from '../components/CopyButton';
 import SectionCard from '../components/SectionCard';
-import FileUpload from '../components/FileUpload';
+import { CopyButton, FileUpload } from '../components/Button';
+import MarkdownPreview from '../components/MarkdownPreview';
 import LoginPrompt from '../components/LoginPrompt';
 import DayCard from '../components/DayCard';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useAuth } from '../contexts/AuthContext';
 import '../styles/global.css';
 import '../styles/meal-organizer.css';
 
 const MealOrganizer = () => {
-  const [availableRecipes, setAvailableRecipes] = useState([]);
-  const [peopleCount, setPeopleCount] = useState(1);
+  // Autenticação
+  const { currentUser } = useAuth();
+  
+  // Usa localStorage para persistir dados automaticamente
+  // TODO: Sincronizar com Firebase quando usuário estiver logado
+  const [availableRecipes, setAvailableRecipes] = useLocalStorage('mealOrganizer_recipes', []);
+  const [peopleCount, setPeopleCount] = useLocalStorage('mealOrganizer_peopleCount', 1);
   
   // Dynamic days state: array of objects { id, name, meals: [] }
-  const [days, setDays] = useState([
+  const [days, setDays] = useLocalStorage('mealOrganizer_days', [
     { id: 'day-1', name: 'Dia 1', meals: [] }
   ]);
 
@@ -243,32 +250,23 @@ const MealOrganizer = () => {
           shoppingList.length > 0 && (
             <CopyButton 
               text={getShoppingListText} 
-              label="📋 Copiar Markdown" 
-              className="btn-secondary"
+              label="Copiar Markdown" 
+              leftIcon="📋"
+              variant="secondary"
             />
           )
         }
       >
-        <div className="shopping-list-markdown">
-          {shoppingList.length === 0 ? (
-            <div className="empty-state">
-              Adicione dias e receitas para gerar sua lista de compras.
-            </div>
-          ) : (
-            shoppingList.map((item, index) => (
-              <div 
-                key={index} 
-                className={`markdown-line ${item.checked ? 'checked' : ''}`}
-                onClick={() => toggleItem(index)}
-              >
-                <span className="md-checkbox">[{item.checked ? 'x' : ' '}]</span>
-                <span className="md-content">
-                  {item.amount > 0 ? parseFloat(item.amount.toFixed(2)) : ''} {item.unit} {item.name}
-                </span>
-              </div>
-            ))
-          )}
-        </div>
+        {shoppingList.length === 0 ? (
+          <div className="empty-state">
+            Adicione dias e receitas para gerar sua lista de compras.
+          </div>
+        ) : (
+          <MarkdownPreview 
+            content={getShoppingListText()} 
+            className="shopping-list-markdown"
+          />
+        )}
       </SectionCard>
     </div>
   );

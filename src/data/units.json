@@ -1,0 +1,13 @@
+[
+  { "sigla": "L", "nome": "Litro" },
+  { "sigla": "ml", "nome": "Mililitro" },
+  { "sigla": "g", "nome": "Grama" },
+  { "sigla": "kg", "nome": "Quilograma" },
+  { "sigla": "un", "nome": "Unidade" },
+  { "sigla": "colher sopa", "nome": "Colher de Sopa" },
+  { "sigla": "colher chá", "nome": "Colher de Chá" },
+  { "sigla": "colher sobremesa", "nome": "Colher de Sobremesa" },
+  { "sigla": "colher café", "nome": "Colher de Café" },
+  { "sigla": "xícara chá", "nome": "Xícara de Chá" },
+  { "sigla": "xícara café", "nome": "Xícara de Café" }
+]

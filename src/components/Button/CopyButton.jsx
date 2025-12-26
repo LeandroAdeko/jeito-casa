@@ -1,24 +1,15 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import Button from './Button';
 
-const StyledButton = styled.button`
-  padding: 8px 16px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background-color: ${props => props.$success ? '#4caf50' : 'var(--card-bg)'};
-  color: ${props => props.$success ? 'white' : 'var(--text-color)'};
-  border-color: ${props => props.$success ? '#4caf50' : 'var(--border-color)'};
-  cursor: pointer;
-  transition: all 0.3s;
-  min-width: 100px;
-  font-size: 0.9rem;
-
-  &:hover {
-    background-color: ${props => props.$success ? '#45a049' : 'var(--hover-bg)'};
-  }
-`;
-
-const CopyButton = ({ text, label = 'Copiar', successLabel = 'Copiado! ✅', className = '' }) => {
+const CopyButton = ({ 
+  text, 
+  label = 'Copiar', 
+  successLabel = 'Copiado! ✅', 
+  className = '', 
+  leftIcon, 
+  rightIcon,
+  variant = 'secondary'
+}) => {
   const [status, setStatus] = useState(label);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -40,13 +31,16 @@ const CopyButton = ({ text, label = 'Copiar', successLabel = 'Copiado! ✅', cla
   };
 
   return (
-    <StyledButton 
+    <Button 
       onClick={handleCopy}
       className={className}
-      $success={isSuccess}
+      variant={isSuccess ? 'success' : variant}
+      leftIcon={isSuccess ? null : leftIcon}
+      rightIcon={rightIcon}
+      style={{ minWidth: '120px' }}
     >
       {status}
-    </StyledButton>
+    </Button>
   );
 };
 

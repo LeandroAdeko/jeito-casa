@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import FileUpload from '../components/FileUpload';
-import DownloadJsonButton from '../components/DownloadJsonButton';
+import {DownloadJsonButton, FileUpload } from '../components/Button';
 import SectionCard from '../components/SectionCard';
 import LoginPrompt from '../components/LoginPrompt';
+import SyncStatusIndicator from '../components/SyncStatusIndicator';
+import { CurrencyInput, CurrencyListInput } from '../components/CurrencyInput';
+import { useFirebaseSync } from '../hooks/useFirebaseSync';
+import { useAuth } from '../contexts/AuthContext';
 import '../styles/global.css';
 import '../styles/bill-splitter.css';
 
@@ -77,22 +80,32 @@ const ResultCard = ({ result, data }) => {
 
 
 const BillSplitter = () => {
-  const [data, setData] = useState({
-    custo_casa: 0,
-    fatura_total: 0,
-    investimento_mes: 0,
-    divisao_custo_casa: 'IGUAL',
-    divisao_fatura: 'IGUAL',
-    contribuintes: [
-      {
-        nome: 'Pessoa 1',
-        salario: 0,
-        parte_fatura: [],
-        beneficio: 0,
-        adianto_fatura: [],
-      },
-    ],
-  });
+  // Autenticação
+  const { currentUser } = useAuth();
+  
+  // Sincronização Firebase + localStorage
+  // Dados salvos localmente E na nuvem quando usuário está logado
+  const [data, setData, syncStatus] = useFirebaseSync(
+    'billSplitter',           // Coleção no Firestore
+    'billSplitter',           // Chave localStorage
+    {                         // Valor inicial
+      custo_casa: 0,
+      fatura_total: 0,
+      investimento_mes: 0,
+      divisao_custo_casa: 'IGUAL',
+      divisao_fatura: 'IGUAL',
+      contribuintes: [
+        {
+          nome: 'Pessoa 1',
+          salario: 0,
+          parte_fatura: [],
+          beneficio: 0,
+          adianto_fatura: [],
+        },
+      ],
+    },
+    currentUser               // Usuário atual
+  );
 
   const [results, setResults] = useState([]);
 
@@ -188,15 +201,6 @@ const BillSplitter = () => {
     setData({ ...data, contribuintes: newContribuintes });
   };
 
-  const updateArrayField = (index, field, valueString) => {
-    // Convert comma separated string to array of numbers
-    const numbers = valueString
-      .split(',')
-      .map((s) => parseFloat(s.trim()))
-      .filter((n) => !isNaN(n));
-    
-    updateContribuinte(index, field, numbers);
-  };
 
   const addContribuinte = () => {
     setData({
@@ -227,6 +231,7 @@ const BillSplitter = () => {
         className="header-actions"
         actions={
           <>
+            <SyncStatusIndicator syncStatus={syncStatus} />
             <FileUpload 
               accept=".json" 
               onChange={handleLoadJSON} 
@@ -247,26 +252,35 @@ const BillSplitter = () => {
         <div className="config-row">
           <div className="form-group">
             <label>Custo Fixo da Casa</label>
-            <input
-              type="number"
+            <CurrencyInput
               value={data.custo_casa}
-              onChange={(e) => updateGlobal('custo_casa', parseFloat(e.target.value) || 0)}
+              onChange={(value) => updateGlobal('custo_casa', value)}
+              decimalSeparator=","
+              thousandSeparator="."
+              prefix="R$ "
+              placeholder="Ex: 1.500,00"
             />
           </div>
           <div className="form-group">
             <label>Fatura Total</label>
-            <input
-              type="number"
+            <CurrencyInput
               value={data.fatura_total}
-              onChange={(e) => updateGlobal('fatura_total', parseFloat(e.target.value) || 0)}
+              onChange={(value) => updateGlobal('fatura_total', value)}
+              decimalSeparator=","
+              thousandSeparator="."
+              prefix="R$ "
+              placeholder="Ex: 800,00"
             />
           </div>
           <div className="form-group">
             <label>Investimento (p/ pessoa)</label>
-            <input
-              type="number"
+            <CurrencyInput
               value={data.investimento_mes}
-              onChange={(e) => updateGlobal('investimento_mes', parseFloat(e.target.value) || 0)}
+              onChange={(value) => updateGlobal('investimento_mes', value)}
+              decimalSeparator=","
+              thousandSeparator="."
+              prefix="R$ "
+              placeholder="Ex: 500,00"
             />
           </div>
           <div className="form-group">
@@ -296,7 +310,6 @@ const BillSplitter = () => {
         <ContributorsSection 
             data={data} 
             updateContribuinte={updateContribuinte} 
-            updateArrayField={updateArrayField} 
             removeContribuinte={removeContribuinte} 
             addContribuinte={addContribuinte} 
         />
@@ -315,7 +328,7 @@ const BillSplitter = () => {
 
 
 
-const ContributorsSection = ({ data, updateContribuinte, updateArrayField, removeContribuinte, addContribuinte }) => {
+const ContributorsSection = ({ data, updateContribuinte, removeContribuinte, addContribuinte }) => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   return (
@@ -342,40 +355,50 @@ const ContributorsSection = ({ data, updateContribuinte, updateArrayField, remov
               <div className="form-row">
                 <div className="form-group">
                   <label>Salário Líquido</label>
-                  <input
-                    type="number"
+                  <CurrencyInput
                     value={c.salario}
-                    onChange={(e) => updateContribuinte(index, 'salario', parseFloat(e.target.value) || 0)}
+                    onChange={(value) => updateContribuinte(index, 'salario', value)}
+                    decimalSeparator=","
+                    thousandSeparator="."
+                    prefix="R$ "
+                    placeholder="Ex: 5.000,00"
                   />
                 </div>
                 <div className="form-group">
                   <label>Benefícios (VA/VR)</label>
-                  <input
-                    type="number"
+                  <CurrencyInput
                     value={c.beneficio}
-                    onChange={(e) => updateContribuinte(index, 'beneficio', parseFloat(e.target.value) || 0)}
+                    onChange={(value) => updateContribuinte(index, 'beneficio', value)}
+                    decimalSeparator=","
+                    thousandSeparator="."
+                    prefix="R$ "
+                    placeholder="Ex: 800,00"
                   />
                 </div>
               </div>
 
               <div className="form-group">
-                <label>Itens na Fatura (separar por vírgula)</label>
-                <input
-                  type="text"
-                  placeholder="Ex: 10.50, 20.00"
-                  value={c.parte_fatura.join(', ')}
-                  onChange={(e) => updateArrayField(index, 'parte_fatura', e.target.value)}
+                <label>Itens na Fatura (separar por ponto e vírgula)</label>
+                <CurrencyListInput
+                  values={c.parte_fatura}
+                  onChange={(values) => updateContribuinte(index, 'parte_fatura', values)}
+                  decimalSeparator=","
+                  thousandSeparator="."
+                  listSeparator=";"
+                  showTotal={true}
+                  placeholder="Ex: 10,50; 20,00; 15,75"
                 />
-                <small>Total: {formatCurrency(c.parte_fatura.reduce((a,b)=>a+b,0))}</small>
               </div>
 
               <div className="form-group">
-                <label>Adiantamentos (separar por vírgula)</label>
-                <input
-                  type="text"
-                  placeholder="Ex: 50.00"
-                  value={c.adianto_fatura.join(', ')}
-                  onChange={(e) => updateArrayField(index, 'adianto_fatura', e.target.value)}
+                <label>Adiantamentos (separar por ponto e vírgula)</label>
+                <CurrencyListInput
+                  values={c.adianto_fatura}
+                  onChange={(values) => updateContribuinte(index, 'adianto_fatura', values)}
+                  decimalSeparator=","
+                  thousandSeparator="."
+                  listSeparator=";"
+                  placeholder="Ex: 50,00; 100,00"
                 />
               </div>
             </div>

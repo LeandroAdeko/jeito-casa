@@ -15,7 +15,7 @@ export const TOOLS = [
   },
   {
     id: 'recipe-creator',
-    path: '/receitas',
+    path: '/recipes',
     title: 'Criador de Receitas',
     description: 'Crie suas receitas, gere arquivos JSON e visualize em Markdown.',
     icon: '🍳'

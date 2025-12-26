@@ -1,25 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
-
-const StyledButton = styled.button`
-  padding: 10px 20px;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  &:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-  }
-`;
+import Button from './Button';
 
 const DownloadJsonButton = ({ data, fileName = 'data.json', label = '💾 Baixar Receita', className = '' }) => {
   const handleDownload = () => {
@@ -38,9 +18,9 @@ const DownloadJsonButton = ({ data, fileName = 'data.json', label = '💾 Baixar
   };
 
   return (
-    <StyledButton onClick={handleDownload} className={className}>
+    <Button onClick={handleDownload} className={className} variant="primary">
       {label}
-    </StyledButton>
+    </Button>
   );
 };
 

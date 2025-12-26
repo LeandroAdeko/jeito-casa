@@ -1,0 +1,73 @@
+.currency-input {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.currency-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.currency-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.currency-input::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.currency-list-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.currency-list-input {
+  resize: vertical;
+  min-height: 2.5rem;
+}
+
+.currency-total {
+  color: #666;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .currency-input {
+    background-color: #2a2a2a;
+    border-color: #444;
+    color: #fff;
+  }
+
+  .currency-input:focus {
+    border-color: #4a9eff;
+    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+  }
+
+  .currency-input:disabled {
+    background-color: #1a1a1a;
+  }
+
+  .currency-input::placeholder {
+    color: #888;
+  }
+
+  .currency-total {
+    color: #aaa;
+  }
+}

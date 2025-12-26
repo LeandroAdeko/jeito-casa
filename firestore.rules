@@ -1,0 +1,78 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Função helper para verificar se o usuário está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Função helper para verificar se o usuário é o dono do documento (baseado no ID do documento)
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Função helper para verificar se o usuário é o dono do dado (baseado no campo userId do documento)
+    function isDataOwner() {
+      return isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // Função helper para verificar se o dado será do usuário autenticado (na criação)
+    function willBeOwner() {
+      return isAuthenticated() && request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Regras para coleção users (dados de perfil)
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Coleções onde o ID do documento é o UID do usuário (Sincronização Simples)
+    match /billSplitter/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    match /mealOrganizer_recipes/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    match /mealOrganizer_peopleCount/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    match /mealOrganizer_days/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    match /recipeCreator/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Regras para coleção recipes (CRUD de receitas com IDs aleatórios)
+    match /recipes/{recipeId} {
+      allow read, update, delete: if isDataOwner();
+      allow create: if willBeOwner();
+    }
+
+    // Regras para coleção ingredients
+    match /ingredients/{ingredientId} {
+      // Usuários podem ler seus próprios ingredientes ou ingredientes públicos (sem userId)
+      allow read: if isAuthenticated() && (
+        !('userId' in resource.data) || 
+        resource.data.userId == null || 
+        resource.data.userId == request.auth.uid
+      );
+      
+      // Apenas o dono pode criar, atualizar ou deletar
+      allow create: if willBeOwner();
+      allow update, delete: if isDataOwner();
+    }
+    
+    // Bloquear acesso a todas as outras coleções por padrão
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
