@@ -10,7 +10,69 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRecipes } from '../hooks/useRecipes';
 import unitsData from '../data/units.json';
 import '../styles/global.css';
-import '../styles/recipe-creator.css';
+
+const PageContainer = styled.div`
+  max-width: 100%;
+  margin: 0 auto;
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+`;
+
+const Title = styled.h1`
+  font-size: 2.5rem;
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const HeaderActions = styled.div`
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+`;
+
+const FormRow = styled.div`
+  margin-bottom: 20px;
+`;
+
+const IngredientRow = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: flex-end;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    padding: 15px;
+    background: var(--bg-hover);
+    border-radius: 8px;
+  }
+`;
+
+const QtdCol = styled.div`
+  width: 80px;
+  @media (max-width: 768px) { width: 100%; }
+`;
+
+const UnitCol = styled.div`
+  width: 150px;
+  @media (max-width: 768px) { width: 100%; }
+`;
+
+const NameCol = styled.div`
+  flex: 1;
+`;
 
 const StepRow = styled.div`
   display: flex;
@@ -21,6 +83,16 @@ const StepRow = styled.div`
   .step-input {
     flex: 1;
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`;
+
+const ActionsContainer = styled.div`
+  display: flex;
+  gap: 10px;
 `;
 
 const RecipeForm = () => {
@@ -138,36 +210,33 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
   }
 
   return (
-    <div className="recipe-creator">
-      {/* Header com título e ações */}
-      <SectionCard 
-        title={recipeId ? "Editar Receita" : "Nova Receita"}
-        titleLevel={1}
-        className="header-actions"
-        actions={
-          <>
-            <Button 
-              onClick={handleCancel} 
-              variant="secondary"
-              leftIcon="❌"
-            >
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleSave} 
-              variant="primary"
-              loading={loading}
-              leftIcon="💾"
-            >
-              {recipeId ? 'Atualizar Receita' : 'Salvar Receita'}
-            </Button>
-          </>
-        }
-      />
+    <PageContainer>
+      <Header>
+        <Title>📝 {recipeId ? "Editar Receita" : "Nova Receita"}</Title>
+        <HeaderActions>
+          <Button 
+            onClick={handleCancel} 
+            variant="secondary"
+            leftIcon="❌"
+            fullWidth
+          >
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            variant="primary"
+            loading={loading}
+            leftIcon="💾"
+            fullWidth
+          >
+            {recipeId ? 'Atualizar Receita' : 'Salvar Receita'}
+          </Button>
+        </HeaderActions>
+      </Header>
 
       {/* Informações Básicas */}
       <SectionCard title="Informações Básicas" titleLevel={2}>
-        <div className="form-group">
+        <FormRow>
           <TextInput
             label="Título da Receita"
             value={recipe.title}
@@ -175,9 +244,9 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
             placeholder="Ex: Bolo de Chocolate"
             required
           />
-        </div>
+        </FormRow>
 
-        <div className="form-group">
+        <FormRow>
           <TextArea
             label="Descrição"
             value={recipe.description}
@@ -187,9 +256,9 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
             maxLength={500}
             showCharCount
           />
-        </div>
+        </FormRow>
 
-        <div className="form-group">
+        <FormRow>
           <NumberInput
             label="Porções"
             value={recipe.portions}
@@ -199,22 +268,22 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
             showButtons
             placeholder="Ex: 4"
           />
-        </div>
+        </FormRow>
       </SectionCard>
 
       {/* Ingredientes */}
       <SectionCard title="Ingredientes" titleLevel={2}>
         {recipe.ingredients.map((ing, index) => (
-          <div key={index} className="ingredient-row" style={{ display: 'flex', gap: '10px', marginBottom: '15px', alignItems: 'flex-end' }}>
-            <div style={{ width: '80px' }}>
+          <IngredientRow key={index}>
+            <QtdCol>
               <TextInput
                 label={index === 0 ? "Qtd" : ""}
                 placeholder="Qtd"
                 value={ing.amount}
                 onChange={(value) => updateIngredient(index, 'amount', value)}
               />
-            </div>
-            <div style={{ width: '150px' }}>
+            </QtdCol>
+            <UnitCol>
               <Select
                 label={index === 0 ? "Unidade" : ""}
                 placeholder="Unidade"
@@ -222,24 +291,24 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                 onChange={(value) => updateIngredient(index, 'unit', value)}
                 options={unitsData.map(u => ({ value: u.nome, label: u.sigla }))}
               />
-            </div>
-            <div style={{ flex: 1 }}>
+            </UnitCol>
+            <NameCol>
               <TextInput
                 label={index === 0 ? "Ingrediente" : ""}
                 placeholder="Ingrediente"
                 value={ing.name}
                 onChange={(value) => updateIngredient(index, 'name', value)}
               />
-            </div>
+            </NameCol>
             <Button 
               onClick={() => removeIngredient(index)} 
               variant="danger" 
               size="small"
-              style={{ marginBottom: '4px' }}
+              style={{ marginBottom: index === 0 ? '4px' : '0' }}
             >
               Remover
             </Button>
-          </div>
+          </IngredientRow>
         ))}
         <Button onClick={addIngredient} variant="outline" fullWidth leftIcon="+">
           Adicionar Ingrediente
@@ -283,7 +352,7 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
       >
         <MarkdownPreview content={generateMarkdown()} />
       </SectionCard>
-    </div>
+    </PageContainer>
   );
 };
 

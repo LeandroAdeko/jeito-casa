@@ -12,9 +12,32 @@ import Modal from '../components/Modal';
 import '../styles/global.css';
 
 const DashboardContainer = styled.div`
-  max-width: 1000px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 40px 20px;
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+`;
+
+const Title = styled.h1`
+  font-size: 2.5rem;
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const HeaderActions = styled.div`
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
 `;
 
 const ListGrid = styled.div`
@@ -71,6 +94,22 @@ const CardActions = styled.div`
   border-top: 1px solid var(--border-color);
 `;
 
+const EmptyStateContent = styled.div`
+  text-align: center;
+  margin-top: 60px;
+  color: var(--text-secondary);
+
+  h2 { color: var(--text-color); margin-bottom: 10px; }
+  p { margin-bottom: 20px; }
+`;
+
+const ModalBody = styled.div`
+  text-align: center;
+  padding: 10px 0;
+  
+  p { font-size: 1.1rem; color: var(--text-color); }
+`;
+
 const ShoppingList = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -116,18 +155,15 @@ const ShoppingList = () => {
 
   return (
     <DashboardContainer>
-      <SectionCard 
-        title="Minhas Listas de Compras" 
-        titleLevel={1}
-        actions={
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-            <SyncStatusIndicator status={syncStatus} />
-            <Button onClick={createNewList} leftIcon="➕" variant="primary">
-              Nova Lista
-            </Button>
-          </div>
-        }
-      />
+      <Header>
+        <Title>🛍️ Listas de Compras</Title>
+        <HeaderActions>
+          <SyncStatusIndicator status={syncStatus} />
+          <Button onClick={createNewList} leftIcon="➕" variant="primary" fullWidth={true}>
+            Nova Lista
+          </Button>
+        </HeaderActions>
+      </Header>
 
       <ListGrid>
         {data.lists.map((list) => (
@@ -172,10 +208,10 @@ const ShoppingList = () => {
       </ListGrid>
 
       {data.lists.length === 0 && (
-        <div style={{ textAlign: 'center', marginTop: '60px', color: 'var(--text-secondary)' }}>
+        <EmptyStateContent>
           <h2>Nenhuma lista encontrada</h2>
           <p>Clique em "Nova Lista" para começar!</p>
-        </div>
+        </EmptyStateContent>
       )}
 
       <ConfirmModal 
@@ -193,9 +229,9 @@ const ShoppingList = () => {
         title="Aviso"
         footer={<Button variant="primary" onClick={() => setAlertModal({ open: false, message: '' })}>Ok</Button>}
       >
-        <div style={{ textAlign: 'center', padding: '10px 0' }}>
-          <p style={{ fontSize: '1.1rem' }}>{alertModal.message}</p>
-        </div>
+        <ModalBody>
+          <p>{alertModal.message}</p>
+        </ModalBody>
       </Modal>
     </DashboardContainer>
   );

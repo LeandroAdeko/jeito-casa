@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import SectionCard from '../components/SectionCard';
 import { CopyButton, FileUpload } from '../components/Button';
 import MarkdownPreview from '../components/MarkdownPreview';
@@ -9,7 +10,114 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useAuth } from '../contexts/AuthContext';
 import { useRecipes } from '../hooks/useRecipes';
 import '../styles/global.css';
-import '../styles/meal-organizer.css';
+
+const PageContainer = styled.div`
+  max-width: 100%;
+  margin: 0 auto;
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+`;
+
+const Title = styled.h1`
+  font-size: 2.5rem;
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const HeaderActions = styled.div`
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+`;
+
+const PeopleCounter = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  label { font-weight: 500; color: var(--text-color); }
+  input { 
+    width: 60px; 
+    padding: 8px; 
+    border-radius: 6px; 
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-color);
+    text-align: center;
+    font-weight: bold;
+    &:focus { outline: none; border-color: var(--primary-color); }
+  }
+`;
+
+const DaysContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const AddDayButton = styled.button`
+  width: 100%;
+  padding: 15px;
+  background: transparent;
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+
+  &:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: var(--bg-hover);
+  }
+`;
+
+const PortionSuggestionsWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const SuggestionGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+`;
+
+const SuggestionCard = styled.div`
+  background-color: var(--bg-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-sm);
+
+  .icon { fontSize: 1.2rem; }
+  .info {
+    .title { font-weight: bold; color: var(--primary-color); }
+    .subtitle { font-size: 0.8rem; color: var(--text-secondary); }
+  }
+`;
+
+const EmptyState = styled.div`
+  padding: 20px;
+  color: var(--text-secondary);
+  text-align: center;
+`;
 
 const MealOrganizer = () => {
   // Autenticação
@@ -169,53 +277,36 @@ const MealOrganizer = () => {
     });
   };
 
-  const toggleItem = (index) => {
-    setShoppingList(prev => {
-      const newList = [...prev];
-      newList[index].checked = !newList[index].checked;
-      return newList;
-    });
-  };
-
   const getShoppingListText = () => {
     return shoppingList.map(item => 
       `- [${item.checked ? 'x' : ' '}] ${item.amount > 0 ? parseFloat(item.amount.toFixed(2)) : ''} ${item.unit} ${item.name}`
     ).join('\n');
   };
 
-  return (
-    <div className="meal-organizer">
-      <SectionCard 
-        title="Organizador de Refeições" 
-        titleLevel={1}
-        className="organizer-header"
-        actions={
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-            <div className="people-counter" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <label htmlFor="people-count" style={{ fontWeight: 500 }}>Pessoas:</label>
-              <input 
-                id="people-count"
-                type="number" 
-                min="1" 
-                value={peopleCount} 
-                onChange={(e) => setPeopleCount(parseInt(e.target.value) || 1)}
-                style={{ width: '60px', padding: '5px', borderRadius: '4px', border: '1px solid var(--border-color)' }}
-              />
-            </div>
-            <FileUpload 
-              accept=".json" 
-              multiple={true}
-              onChange={handleLoadRecipes} 
-              label="Carregar Receitas"
-            />
-          </div>
-        }
-      />
+  if (!currentUser) {
+    return <LoginPrompt />;
+  }
 
-      <LoginPrompt />
+  return (
+    <PageContainer>
+      <Header>
+        <Title>📅 Organizador de Refeições</Title>
+        <HeaderActions>
+          <PeopleCounter>
+            <label htmlFor="people-count">Pessoas:</label>
+            <input 
+              id="people-count"
+              type="number" 
+              min="1" 
+              value={peopleCount} 
+              onChange={(e) => setPeopleCount(parseInt(e.target.value) || 1)}
+            />
+          </PeopleCounter>
+        </HeaderActions>
+      </Header>
 
       <SectionCard title="Planejamento de Dias">
-        <div className="days-container">
+        <DaysContainer>
           {days.map((day, dayIndex) => (
             <DayCard
               key={day.id}
@@ -230,54 +321,45 @@ const MealOrganizer = () => {
             />
           ))}
           
-          <button onClick={addDay} className="btn-add-day">
+          <AddDayButton onClick={addDay}>
             + Adicionar Dia
-          </button>
-        </div>
+          </AddDayButton>
+        </DaysContainer>
       </SectionCard>
 
       <SectionCard title="💡 Sugestões de Porções Extras">
-        <div className="portion-suggestions">
+        <PortionSuggestionsWrapper>
           {Object.keys(portionSuggestions).length > 0 ? (
             <>
               <p style={{ color: 'var(--text-secondary)', marginBottom: '15px' }}>
                 Baseado no número de pessoas, algumas receitas gerarão porções extras. Você pode aproveitá-las em outros dias!
               </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              <SuggestionGrid>
                 {Object.entries(portionSuggestions).map(([recipe, amount], idx) => (
-                  <div key={idx} style={{ 
-                    backgroundColor: 'var(--bg-color)', 
-                    border: '1px solid var(--primary-color)', 
-                    borderRadius: '8px', 
-                    padding: '10px 15px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px'
-                  }}>
-                    <span style={{ fontSize: '1.2rem' }}>🥡</span>
-                    <div>
-                      <div style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>{amount}x {recipe}</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Porções extras</div>
+                  <SuggestionCard key={idx}>
+                    <span className="icon">🥡</span>
+                    <div className="info">
+                      <div className="title">{amount}x {recipe}</div>
+                      <div className="subtitle">Porções extras</div>
                     </div>
-                  </div>
+                  </SuggestionCard>
                 ))}
-              </div>
+              </SuggestionGrid>
             </>
           ) : (
-            <div style={{ padding: '20px', color: 'var(--text-secondary)' }}>
+            <EmptyState>
               ✅ Distribuição perfeita! Não haverá sobras de porções.
-            </div>
+            </EmptyState>
           )}
-        </div>
+        </PortionSuggestionsWrapper>
       </SectionCard>
 
       <SectionCard 
         title="Lista de Compras" 
-        className="shopping-list-section"
         actions={
           shoppingList.length > 0 && (
             <CopyButton 
-              text={getShoppingListText} 
+              text={getShoppingListText()} 
               label="Copiar Markdown" 
               leftIcon="📋"
               variant="secondary"
@@ -286,14 +368,11 @@ const MealOrganizer = () => {
         }
       >
         {shoppingList.length === 0 ? (
-          <div className="empty-state">
+          <EmptyState>
             Adicione dias e receitas para gerar sua lista de compras.
-          </div>
+          </EmptyState>
         ) : (
-          <MarkdownPreview 
-            content={getShoppingListText()} 
-            className="shopping-list-markdown"
-          />
+          <MarkdownPreview content={getShoppingListText()} />
         )}
       </SectionCard>
 
@@ -302,7 +381,7 @@ const MealOrganizer = () => {
         onClose={closeRecipeModal} 
         recipe={selectedRecipe} 
       />
-    </div>
+    </PageContainer>
   );
 };
 

@@ -7,15 +7,14 @@ import LoginPrompt from '../components/LoginPrompt';
 import { Button } from '../components/Button';
 
 const Container = styled.div`
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 40px 20px;
 `;
 
 const Header = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 15px;
   margin-bottom: 40px;
 `;
 
@@ -23,6 +22,9 @@ const Title = styled.h1`
   font-size: 2.5rem;
   color: var(--text-color);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 
@@ -176,7 +178,7 @@ const RecipeList = () => {
     <Container>
       <Header>
         <Title>📚 Minhas Receitas</Title>
-        <Button onClick={handleCreate} leftIcon="➕" size="large">
+        <Button onClick={handleCreate} leftIcon="➕" size="large" fullWidth>
           Nova Receita
         </Button>
       </Header>

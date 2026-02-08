@@ -8,13 +8,33 @@ import { TextInput, TextArea, NumberInput } from '../components/Input';
 import { useAuth } from '../contexts/AuthContext';
 import { useRecipes } from '../hooks/useRecipes';
 import '../styles/global.css';
-import '../styles/recipe-creator.css';
 
-const RecipeList = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
+const PageContainer = styled.div`
+  max-width: 100%;
+  margin: 0 auto;
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+`;
+
+const Title = styled.h1`
+  font-size: 2.5rem;
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const HeaderActions = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
 `;
 
 const RecipeCard = styled.div`
@@ -87,10 +107,96 @@ const EmptyState = styled.div`
 
 const ModeToggle = styled.div`
   display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-bottom: 20px;
 `;
 
+const IngredientRow = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+
+  input {
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+
+  .qtd { width: 60px; text-align: center; }
+  .unit { width: 80px; }
+  .name { flex: 1; }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    background: var(--bg-hover);
+    padding: 10px;
+    border-radius: 8px;
+    
+    .qtd, .unit { width: 100%; text-align: left; }
+  }
+`;
+
+const StepRow = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: flex-start;
+
+  .step-number {
+    font-weight: bold;
+    min-width: 20px;
+    padding-top: 10px;
+    color: var(--text-color);
+  }
+
+  textarea {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: inherit;
+    resize: vertical;
+    min-height: 60px;
+  }
+`;
+
+const FormActions = styled.div`
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+`;
+
+const FormItem = styled.div`
+  margin-bottom: 15px;
+`;
+
+const MarkdownPreviewContainer = styled.div`
+  line-height: 1.6;
+  color: var(--text-color);
+
+  h1, h2, h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+  }
+
+  ul, ol {
+    padding-left: 20px;
+    margin-bottom: 15px;
+  }
+
+  li {
+    margin-bottom: 5px;
+  }
+`;
 
 const RecipeCreator = () => {
   const { currentUser } = useAuth();
@@ -239,14 +345,32 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
   }
 
   return (
-    <div className="recipe-creator">
-      <SectionCard 
-        title="Criador de Receitas" 
-        titleLevel={1}
-        className="header-actions"
-        actions={
-          mode !== 'list' && (
-            <>
+    <PageContainer>
+      <Header>
+        <Title>🍳 Criador de Receitas</Title>
+        <HeaderActions>
+          <ModeToggle>
+            <Button 
+              variant={mode === 'list' ? 'primary' : 'outline'} 
+              onClick={() => setMode('list')}
+              fullWidth
+            >
+              📚 Minhas Receitas ({recipes.length})
+            </Button>
+            <Button 
+              variant={mode === 'create' ? 'primary' : 'outline'} 
+              onClick={() => {
+                handleCancel();
+                setMode('create');
+              }}
+              fullWidth
+            >
+              ➕ Nova Receita
+            </Button>
+          </ModeToggle>
+
+          {mode !== 'list' && (
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <FileUpload 
                 accept=".json" 
                 onChange={handleLoadJSON} 
@@ -257,27 +381,10 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                 fileName="receita.json" 
                 label="💾 Baixar JSON"
               />
-            </>
-          )
-        }
-      >
-        <ModeToggle>
-          <Button 
-            variant={mode === 'list' ? 'primary' : 'outline'} 
-            onClick={() => setMode('list')}
-          >
-            📚 Minhas Receitas ({recipes.length})
-          </Button>
-          <Button 
-            variant={mode === 'create' ? 'primary' : 'outline'} 
-            onClick={() => {
-              handleCancel();
-              setMode('create');
-            }}
-          >
-            ➕ Nova Receita
-          </Button>
-        </ModeToggle>
+            </div>
+          )}
+        </HeaderActions>
+      </Header>
 
         {mode === 'list' && (
           <>
@@ -327,7 +434,7 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
         {(mode === 'create' || mode === 'edit') && (
           <>
             <SectionCard title="Informações Básicas" titleLevel={2}>
-              <div className="form-group">
+              <FormItem>
                 <TextInput
                   label="Título da Receita"
                   value={recipe.title}
@@ -335,9 +442,9 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                   placeholder="Ex: Bolo de Chocolate"
                   required
                 />
-              </div>
+              </FormItem>
 
-              <div className="form-group">
+              <FormItem>
                 <TextArea
                   label="Descrição"
                   value={recipe.description}
@@ -347,9 +454,9 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                   maxLength={500}
                   showCharCount
                 />
-              </div>
+              </FormItem>
 
-              <div className="form-group">
+              <FormItem>
                 <NumberInput
                   label="Porções"
                   value={recipe.portions}
@@ -359,26 +466,29 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                   showButtons
                   placeholder="Ex: 4"
                 />
-              </div>
+              </FormItem>
             </SectionCard>
 
             <SectionCard title="Ingredientes" titleLevel={2}>
               {recipe.ingredients.map((ing, index) => (
-                <div key={index} className="ingredient-row">
+                <IngredientRow key={index}>
                   <input
                     type="text"
+                    className="qtd"
                     placeholder="Qtd"
                     value={ing.amount}
                     onChange={(e) => updateIngredient(index, 'amount', e.target.value)}
                   />
                   <input
                     type="text"
+                    className="unit"
                     placeholder="Unidade"
                     value={ing.unit}
                     onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
                   />
                   <input
                     type="text"
+                    className="name"
                     placeholder="Ingrediente"
                     value={ing.name}
                     onChange={(e) => updateIngredient(index, 'name', e.target.value)}
@@ -386,7 +496,7 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                   <Button onClick={() => removeIngredient(index)} variant="danger" size="small">
                     Remover
                   </Button>
-                </div>
+                </IngredientRow>
               ))}
               <Button onClick={addIngredient} variant="outline" fullWidth leftIcon="+">
                 Adicionar Ingrediente
@@ -395,7 +505,7 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
 
             <SectionCard title="Modo de Preparo" titleLevel={2}>
               {recipe.steps.map((step, index) => (
-                <div key={index} className="step-row">
+                <StepRow key={index}>
                   <span className="step-number">{index + 1}.</span>
                   <textarea
                     placeholder={`Passo ${index + 1}`}
@@ -406,32 +516,31 @@ ${recipe.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
                   <Button onClick={() => removeStep(index)} variant="danger" size="small">
                     Remover
                   </Button>
-                </div>
+                </StepRow>
               ))}
               <Button onClick={addStep} variant="outline" fullWidth leftIcon="+">
                 Adicionar Passo
               </Button>
             </SectionCard>
 
-            <div className="action-buttons">
+            <FormActions>
               <Button onClick={handleSave} variant="primary" leftIcon="💾">
                 {mode === 'edit' ? 'Atualizar Receita' : 'Salvar Receita'}
               </Button>
               <Button onClick={handleCancel} variant="secondary" leftIcon="❌">
                 Cancelar
               </Button>
-            </div>
+            </FormActions>
 
             <SectionCard title="Preview Markdown" titleLevel={2}>
-              <div className="markdown-preview">
+              <MarkdownPreviewContainer>
                 <ReactMarkdown>{generateMarkdown()}</ReactMarkdown>
-              </div>
+              </MarkdownPreviewContainer>
               <CopyButton text={generateMarkdown()} label="Copiar Markdown" />
             </SectionCard>
           </>
         )}
-      </SectionCard>
-    </div>
+    </PageContainer>
   );
 };
 

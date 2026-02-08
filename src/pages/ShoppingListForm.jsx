@@ -14,16 +14,41 @@ import unitsData from '../data/units.json';
 import '../styles/global.css';
 
 const PageContainer = styled.div`
-  max-width: 800px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 20px;
 `;
 
-const HeaderActions = styled.div`
+const Header = styled.div`
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
 `;
+
+const Title = styled.h1`
+  font-size: 2.5rem;
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const HeaderActionsArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+`;
+
+const TopActions = styled.div`
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+// Removed legacy HeaderActions
 
 const QuickAddRow = styled.form`
   display: flex;
@@ -35,6 +60,12 @@ const QuickAddRow = styled.form`
   .item-name { flex: 2; min-width: 150px; }
   .item-amount { width: 80px; }
   .item-unit { width: 120px; }
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: stretch;
+    .item-amount, .item-unit { width: 100%; }
+  }
 `;
 
 const ItemsContainer = styled.div`
@@ -51,29 +82,65 @@ const ItemRow = styled.div`
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
+  transition: all 0.2s;
   
   &:hover {
     border-color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
   }
 `;
 
-const ItemText = styled.div`
+const ItemTextContent = styled.div`
   flex: 1;
   font-weight: 500;
   display: flex;
   gap: 8px;
   align-items: baseline;
+  color: var(--text-color);
 `;
 
-const Amount = styled.span`
+const AmountLabel = styled.span`
   color: var(--primary-color);
   font-weight: 600;
   font-size: 0.95rem;
 `;
 
-const Unit = styled.span`
+const UnitLabel = styled.span`
   color: var(--text-secondary);
   font-size: 0.85rem;
+`;
+
+const SectionTitle = styled.h3`
+  margin: 30px 0 15px 0;
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+  font-size: 1.1rem;
+  color: var(--text-color);
+`;
+
+const ImportSection = styled.div`
+  margin-top: 20px;
+
+  p {
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+  }
+`;
+
+const ImportGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+`;
+
+const EmptyStateContainer = styled.div`
+  text-align: center;
+  padding: 30px;
+  color: var(--text-secondary);
+  border: 1px dashed var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-hover);
 `;
 
 const ShoppingListForm = () => {
@@ -94,7 +161,6 @@ const ShoppingListForm = () => {
   const [importSource, setImportSource] = useState(null);
   const [importItems, setImportItems] = useState([]);
   const [importMetadata, setImportMetadata] = useState([]);
-  const [selectedRecipeId, setSelectedRecipeId] = useState('');
 
   const activeList = useMemo(() => {
     return data.lists.find(l => l.id === listId);
@@ -240,23 +306,24 @@ const ShoppingListForm = () => {
 
   return (
     <PageContainer>
-      <HeaderActions>
-        <Button onClick={() => navigate('/lista-compras')} variant="secondary" leftIcon="⬅️">Voltar</Button>
-        <div style={{ flex: 1 }} />
-        <SyncStatusIndicator status={syncStatus} />
-      </HeaderActions>
+      <Header>
+        <Title>📝 Editar Lista</Title>
+        <HeaderActionsArea>
+          <TopActions>
+            <Button onClick={() => navigate('/lista-compras')} variant="secondary" leftIcon="⬅️">Voltar</Button>
+            <SyncStatusIndicator status={syncStatus} />
+          </TopActions>
+          <TextInput 
+            label="Nome da Lista" 
+            value={listName} 
+            onChange={handleRename} 
+            placeholder="Ex: Rancho do Mês"
+          />
+        </HeaderActionsArea>
+      </Header>
 
-      <SectionCard title="Editar Lista">
-        <TextInput 
-          label="Nome da Lista" 
-          value={listName} 
-          onChange={handleRename} 
-          placeholder="Ex: Rancho do Mês"
-        />
-        
-        <div style={{ margin: '30px 0 10px 0', borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
-          <h3>Itens da Lista</h3>
-        </div>
+      <SectionCard>
+        <SectionTitle style={{ marginTop: 0, border: 'none', paddingTop: 0 }}>Itens da Lista</SectionTitle>
 
         <QuickAddRow onSubmit={addItem}>
           <div className="item-name">
@@ -287,15 +354,15 @@ const ShoppingListForm = () => {
         <ItemsContainer>
           {activeList.items.map(item => (
             <ItemRow key={item.id}>
-              <ItemText>
+              <ItemTextContent>
                 <span style={{ flex: 1 }}>{item.name}</span>
                 {item.amount && (
-                  <Amount>
+                  <AmountLabel>
                     {item.amount}
-                    <Unit style={{ marginLeft: '4px' }}>{item.unit}</Unit>
-                  </Amount>
+                    <UnitLabel style={{ marginLeft: '4px' }}>{item.unit}</UnitLabel>
+                  </AmountLabel>
                 )}
-              </ItemText>
+              </ItemTextContent>
               <Button 
                 variant="ghost" 
                 size="small" 
@@ -307,27 +374,29 @@ const ShoppingListForm = () => {
             </ItemRow>
           ))}
           {activeList.items.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-secondary)', border: '1px dashed var(--border-color)', borderRadius: '12px' }}>
+            <EmptyStateContainer>
               Nenhum item adicionado ainda.
-            </div>
+            </EmptyStateContainer>
           )}
         </ItemsContainer>
       </SectionCard>
 
-      <SectionCard title="Importar" style={{ marginTop: '20px' }}>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '15px', fontSize: '0.95rem' }}>
-          Adicione rapidamente itens à sua lista baseando-se no que você planejou comer ou em suas receitas salvas.
-        </p>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-          <Button variant="outline" fullWidth onClick={handlePullFromOrganizer} leftIcon="📅">
-            Importar planejamento
-          </Button>
+      <SectionCard title="Importar">
+        <ImportSection>
+          <p>
+            Adicione rapidamente itens à sua lista baseando-se no que você planejou comer ou em suas receitas salvas.
+          </p>
+          
+          <ImportGrid>
+            <Button variant="outline" fullWidth onClick={handlePullFromOrganizer} leftIcon="📅">
+              Importar planejamento
+            </Button>
 
-          <Button variant="outline" fullWidth onClick={() => setImportSource('recipe')} leftIcon="🍳">
-            Importar receita
-          </Button>
-        </div>
+            <Button variant="outline" fullWidth onClick={() => setImportSource('recipe')} leftIcon="🍳">
+              Importar receita
+            </Button>
+          </ImportGrid>
+        </ImportSection>
       </SectionCard>
 
       <ImportModal 

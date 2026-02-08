@@ -11,16 +11,32 @@ import ConfirmModal from '../components/ConfirmModal';
 import '../styles/global.css';
 
 const PageContainer = styled.div`
-  max-width: 600px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 20px;
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+`;
+
+const Title = styled.h1`
+  font-size: 2.5rem;
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 const HeaderActions = styled.div`
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 15px;
   align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
 `;
 
 const ItemsContainer = styled.div`
@@ -35,23 +51,17 @@ const ItemRow = styled.div`
   align-items: center;
   gap: 15px;
   padding: 16px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
+  background-color: ${props => props.checked ? 'var(--bg-hover)' : 'var(--card-bg)'};
+  border: 1px solid ${props => props.checked ? 'transparent' : 'var(--border-color)'};
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
+  opacity: ${props => props.checked ? 0.6 : 1};
   
   &:hover {
     border-color: var(--primary-color);
     transform: translateX(4px);
-  }
-
-  &.checked {
-    opacity: 0.5;
-    background-color: var(--bg-hover);
-    .item-text {
-      text-decoration: line-through;
-    }
+    box-shadow: var(--shadow-sm);
   }
 `;
 
@@ -65,6 +75,7 @@ const Checkbox = styled.div`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: all 0.2s;
 
   &::after {
     content: '✓';
@@ -74,22 +85,40 @@ const Checkbox = styled.div`
   }
 `;
 
-const ItemText = styled.div`
+const ItemTextContent = styled.div`
   flex: 1;
   font-size: 1.1rem;
   font-weight: 500;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: var(--text-color);
+  text-decoration: ${props => props.checked ? 'line-through' : 'none'};
 `;
 
-const Badge = styled.span`
+const BadgeLabel = styled.span`
   background: var(--bg-hover);
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 0.85rem;
   color: var(--primary-color);
   font-weight: 600;
+  border: 1px solid var(--border-color);
+`;
+
+const SectionInfo = styled.p`
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+`;
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+
+  h3 { margin-bottom: 10px; color: var(--text-color); }
+  p { margin-bottom: 20px; }
 `;
 
 const ShoppingListUsage = () => {
@@ -137,50 +166,48 @@ const ShoppingListUsage = () => {
 
   return (
     <PageContainer>
-      <HeaderActions>
-        <Button onClick={() => navigate('/lista-compras')} variant="secondary" leftIcon="⬅️">Sair</Button>
-        <div style={{ flex: 1 }} />
-        <SyncStatusIndicator status={syncStatus} />
-        <Button onClick={() => navigate(`/lista-compras/edit/${listId}`)} variant="ghost" leftIcon="✏️">Editar</Button>
-      </HeaderActions>
-
-      <SectionCard 
-        title={activeList.name} 
-        actions={
-          activeList.items.some(i => i.checked) && (
+      <Header>
+        <Title>🛒 {activeList.name}</Title>
+        <HeaderActions>
+          <Button onClick={() => navigate('/lista-compras')} variant="secondary" leftIcon="⬅️">Sair</Button>
+          <SyncStatusIndicator status={syncStatus} />
+          <Button onClick={() => navigate(`/lista-compras/edit/${listId}`)} variant="ghost" leftIcon="✏️">Editar</Button>
+          {activeList.items.some(i => i.checked) && (
             <Button variant="danger" size="small" onClick={() => setShowFinishModal(true)}>Finalizar</Button>
-          )
-        }
-      >
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '20px' }}>
+          )}
+        </HeaderActions>
+      </Header>
+
+      <SectionCard>
+        <SectionInfo>
           Toque nos itens para marcar como comprado.
-        </p>
+        </SectionInfo>
 
         <ItemsContainer>
           {activeList.items.map(item => (
             <ItemRow 
               key={item.id} 
-              className={item.checked ? 'checked' : ''}
+              checked={item.checked}
               onClick={() => toggleItem(item.id)}
             >
               <Checkbox checked={item.checked} />
-              <ItemText className="item-text">
+              <ItemTextContent checked={item.checked}>
                 <span>{item.name}</span>
                 {item.amount && (
-                  <Badge>{item.amount} {item.unit}</Badge>
+                  <BadgeLabel>{item.amount} {item.unit}</BadgeLabel>
                 )}
-              </ItemText>
+              </ItemTextContent>
             </ItemRow>
           ))}
 
           {activeList.items.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+            <EmptyState>
               <h3>Tudo pronto!</h3>
               <p>Não há itens nesta lista.</p>
-              <Button onClick={() => navigate(`/lista-compras/edit/${listId}`)} variant="outline" style={{ marginTop: '20px' }}>
+              <Button onClick={() => navigate(`/lista-compras/edit/${listId}`)} variant="outline">
                 Adicionar Itens
               </Button>
-            </div>
+            </EmptyState>
           )}
         </ItemsContainer>
       </SectionCard>

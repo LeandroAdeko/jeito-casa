@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import {DownloadJsonButton, FileUpload } from '../components/Button';
 import SectionCard from '../components/SectionCard';
 import LoginPrompt from '../components/LoginPrompt';
@@ -7,7 +8,231 @@ import { CurrencyInput, CurrencyListInput } from '../components/CurrencyInput';
 import { useFirebaseSync } from '../hooks/useFirebaseSync';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/global.css';
-import '../styles/bill-splitter.css';
+
+const PageContainer = styled.div`
+  max-width: 100%;
+  margin: 0 auto;
+`;
+
+const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+`;
+
+const Title = styled.h1`
+  font-size: 2.5rem;
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const HeaderActions = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+`;
+
+const Card = styled.div`
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  margin-bottom: 20px;
+`;
+
+const ResultCardContainer = styled(Card)`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+`;
+
+const ResultHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  h3 { margin: 0; font-size: 1.2rem; }
+`;
+
+const ResultSummary = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  
+  .label { color: var(--text-secondary); font-size: 0.8rem; }
+  .value { font-weight: bold; color: var(--primary-color); font-size: 1rem; }
+`;
+
+const DetailsButton = styled.button`
+  background: none;
+  border: 1px solid var(--border-color);
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  width: 100%;
+
+  &:hover {
+    background: var(--hover-bg);
+    color: var(--text-color);
+  }
+`;
+
+const ResultDetails = styled.div`
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  hr { border: none; border-top: 1px solid var(--border-color); margin: 5px 0; }
+`;
+
+const ResultRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+
+  &.highlight { font-weight: 600; color: var(--text-color); }
+  &.final { 
+    margin-top: 10px;
+    font-weight: bold; 
+    font-size: 1rem; 
+    color: var(--primary-color);
+    // padding: 10px;
+    background: var(--bg-hover);
+    border-radius: 6px;
+  }
+  
+  .negative { color: #d32f2f; }
+`;
+
+const ConfigGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 15px;
+`;
+
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); }
+
+  select {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: inherit;
+  }
+`;
+
+const ContributorsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+`;
+
+const ContributorCard = styled(Card)`
+  border-top: 4px solid var(--primary-color);
+`;
+
+const ContributorHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  input {
+    flex: 1;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--text-color);
+    padding-bottom: 5px;
+    width: 80%;
+    
+    &:focus { outline: none; border-color: var(--primary-color); }
+  }
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 5px;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    &:hover { opacity: 1; }
+  }
+`;
+
+const AddButton = styled.button`
+  width: 100%;
+  padding: 20px;
+  background: transparent;
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 20px;
+
+  &:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: var(--bg-hover);
+  }
+`;
+
+const ResultsGrid = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const SectionHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  cursor: pointer;
+
+  h2 { margin: 0; font-size: 1.5rem; }
+  
+  .collapse-btn {
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+`;
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -17,74 +242,69 @@ const ResultCard = ({ result, data }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
 
   return (
-    <div className="card result-card">
-      <div className="result-header">
+    <ResultCardContainer>
+      <ResultHeader>
         <h3>{result.nome}</h3>
-        <div className="result-summary">
-          <span className="summary-label">A Transferir:</span>
-          <span className="summary-value">{formatCurrency(result.aTransferir)}</span>
-        </div>
-        <button 
-          className="btn-details" 
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
+        <ResultSummary>
+          <span className="label">A Transferir:</span>
+          <span className="value">{formatCurrency(result.aTransferir)}</span>
+        </ResultSummary>
+        <DetailsButton onClick={() => setIsExpanded(!isExpanded)}>
           {isExpanded ? 'Ocultar Detalhes ▲' : 'Ver Detalhes ▼'}
-        </button>
-      </div>
+        </DetailsButton>
+      </ResultHeader>
 
       {isExpanded && (
-        <div className="result-details">
-          <div className="result-row">
+        <ResultDetails>
+          <ResultRow>
             <span>Renda Total:</span>
             <span>{formatCurrency(result.rendaBruta)} ({result.porcentagemRenda.toFixed(1)}%)</span>
-          </div>
+          </ResultRow>
           <hr />
-          <div className="result-row">
+          <ResultRow>
             <span>Custo Casa:</span>
             <span>+ {formatCurrency(result.contribuicaoCasa)}</span>
-          </div>
-          <div className="result-row">
+          </ResultRow>
+          <ResultRow>
             <span>Fatura Compartilhada:</span>
             <span>+ {formatCurrency(result.contribuicaoFaturaCompartilhada)}</span>
-          </div>
-          <div className="result-row">
+          </ResultRow>
+          <ResultRow>
             <span>Fatura Individual:</span>
             <span>+ {formatCurrency(result.faturaIndividual)}</span>
-          </div>
-          <div className="result-row highlight">
+          </ResultRow>
+          <ResultRow className="highlight">
             <span>Total Contas:</span>
             <span>= {formatCurrency(result.contribuicaoFaturaTotal + result.contribuicaoCasa)}</span>
-          </div>
+          </ResultRow>
           <hr />
-          <div className="result-row">
+          <ResultRow>
             <span>Investimento:</span>
             <span>+ {formatCurrency(data.investimento_mes)}</span>
-          </div>
-          <div className="result-row">
+          </ResultRow>
+          <ResultRow>
             <span>Abate Benefícios:</span>
             <span className="negative">- {formatCurrency(data.contribuintes.find(c => c.nome === result.nome)?.beneficio || 0)}</span>
-          </div>
-          <div className="result-row">
+          </ResultRow>
+          <ResultRow>
             <span>Abate Adiantamentos:</span>
             <span className="negative">- {formatCurrency(data.contribuintes.find(c => c.nome === result.nome)?.adianto_fatura.reduce((a,b)=>a+b,0) || 0)}</span>
-          </div>
-          <div className="result-row final">
+          </ResultRow>
+          <ResultRow className="final">
             <span>A TRANSFERIR:</span>
             <span>{formatCurrency(result.aTransferir)}</span>
-          </div>
-        </div>
+          </ResultRow>
+        </ResultDetails>
       )}
-    </div>
+    </ResultCardContainer>
   );
 };
-
 
 const BillSplitter = () => {
   // Autenticação
   const { currentUser } = useAuth();
   
   // Sincronização Firebase + localStorage
-  // Dados salvos localmente E na nuvem quando usuário está logado
   const [data, setData, syncStatus] = useFirebaseSync(
     'billSplitter',           // Coleção no Firestore
     'billSplitter',           // Chave localStorage
@@ -182,7 +402,6 @@ const BillSplitter = () => {
     reader.onload = (event) => {
       try {
         const json = JSON.parse(event.target.result);
-        // Basic validation could go here
         setData(json);
       } catch (error) {
         alert('Erro ao ler arquivo JSON');
@@ -224,33 +443,18 @@ const BillSplitter = () => {
   };
 
   return (
-    <div className="bill-splitter">
-      <SectionCard 
-        title="Calculadora de Contas" 
-        titleLevel={1}
-        className="header-actions"
-        actions={
-          <>
-            <SyncStatusIndicator syncStatus={syncStatus} />
-            <FileUpload 
-              accept=".json" 
-              onChange={handleLoadJSON} 
-              label="Carregar Conta" 
-            />
-            <DownloadJsonButton 
-              data={data} 
-              fileName="calculo_casa.json" 
-              label="💾 Baixar Conta"
-            />
-          </>
-        }
-      />
+    <PageContainer>
+      <Header>
+        <Title>💸 Calculadora de Contas</Title>
+        <HeaderActions>
+        </HeaderActions>
+      </Header>
 
       <LoginPrompt />
 
-      <SectionCard title="Configurações da Casa" className="config-section">
-        <div className="config-row">
-          <div className="form-group">
+      <SectionCard title="Configurações da Casa">
+        <ConfigGrid>
+          <FormGroup>
             <label>Custo Fixo da Casa</label>
             <CurrencyInput
               value={data.custo_casa}
@@ -260,8 +464,8 @@ const BillSplitter = () => {
               prefix="R$ "
               placeholder="Ex: 1.500,00"
             />
-          </div>
-          <div className="form-group">
+          </FormGroup>
+          <FormGroup>
             <label>Fatura Total</label>
             <CurrencyInput
               value={data.fatura_total}
@@ -271,8 +475,8 @@ const BillSplitter = () => {
               prefix="R$ "
               placeholder="Ex: 800,00"
             />
-          </div>
-          <div className="form-group">
+          </FormGroup>
+          <FormGroup>
             <label>Investimento (p/ pessoa)</label>
             <CurrencyInput
               value={data.investimento_mes}
@@ -282,8 +486,8 @@ const BillSplitter = () => {
               prefix="R$ "
               placeholder="Ex: 500,00"
             />
-          </div>
-          <div className="form-group">
+          </FormGroup>
+          <FormGroup>
             <label>Divisão Custo Casa</label>
             <select
               value={data.divisao_custo_casa}
@@ -292,8 +496,8 @@ const BillSplitter = () => {
               <option value="IGUAL">Igual</option>
               <option value="PROPORCIONAL">Proporcional</option>
             </select>
-          </div>
-          <div className="form-group">
+          </FormGroup>
+          <FormGroup>
             <label>Divisão Fatura</label>
             <select
               value={data.divisao_fatura}
@@ -302,8 +506,8 @@ const BillSplitter = () => {
               <option value="IGUAL">Igual</option>
               <option value="PROPORCIONAL">Proporcional</option>
             </select>
-          </div>
-        </div>
+          </FormGroup>
+        </ConfigGrid>
       </SectionCard>
 
       <SectionCard>
@@ -315,14 +519,14 @@ const BillSplitter = () => {
         />
       </SectionCard>
 
-      <SectionCard title="Resultados" className="results-section">
-        <div className="results-grid">
+      <SectionCard title="Resultados">
+        <ResultsGrid>
           {results.map((r, index) => (
             <ResultCard key={index} result={r} data={data} />
           ))}
-        </div>
+        </ResultsGrid>
       </SectionCard>
-    </div>
+    </PageContainer>
   );
 };
 
@@ -332,79 +536,80 @@ const ContributorsSection = ({ data, updateContribuinte, removeContribuinte, add
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   return (
-    <div className="contributors-section-wrapper">
-      <div className="section-header" onClick={() => setIsCollapsed(!isCollapsed)}>
+    <div>
+      <SectionHeader onClick={() => setIsCollapsed(!isCollapsed)}>
         <h2>Contribuintes</h2>
-        <button className="btn-collapse">{isCollapsed ? '▼' : '▲'}</button>
-      </div>
+        <div className="collapse-btn">{isCollapsed ? '▼' : '▲'}</div>
+      </SectionHeader>
       
       {!isCollapsed && (
-        <div className="contributors-grid">
-          {data.contribuintes.map((c, index) => (
-            <div key={index} className="card contributor-card">
-              <div className="card-header">
-                <input
-                  type="text"
-                  value={c.nome}
-                  onChange={(e) => updateContribuinte(index, 'nome', e.target.value)}
-                  className="input-name"
-                />
-                <button onClick={() => removeContribuinte(index)} className="btn-remove">🗑️</button>
-              </div>
-              
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Salário Líquido</label>
-                  <CurrencyInput
-                    value={c.salario}
-                    onChange={(value) => updateContribuinte(index, 'salario', value)}
+        <>
+          <ContributorsGrid>
+            {data.contribuintes.map((c, index) => (
+              <ContributorCard key={index}>
+                <ContributorHeader>
+                  <input
+                    type="text"
+                    value={c.nome}
+                    onChange={(e) => updateContribuinte(index, 'nome', e.target.value)}
+                  />
+                  <button onClick={() => removeContribuinte(index)}>🗑️</button>
+                </ContributorHeader>
+                
+                <ConfigGrid>
+                  <FormGroup>
+                    <label>Salário Líquido</label>
+                    <CurrencyInput
+                      value={c.salario}
+                      onChange={(value) => updateContribuinte(index, 'salario', value)}
+                      decimalSeparator=","
+                      thousandSeparator="."
+                      prefix="R$ "
+                      placeholder="Ex: 5.000,00"
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <label>Benefícios (VA/VR)</label>
+                    <CurrencyInput
+                      value={c.beneficio}
+                      onChange={(value) => updateContribuinte(index, 'beneficio', value)}
+                      decimalSeparator=","
+                      thousandSeparator="."
+                      prefix="R$ "
+                      placeholder="Ex: 800,00"
+                    />
+                  </FormGroup>
+                </ConfigGrid>
+
+                <FormGroup style={{ marginTop: '15px' }}>
+                  <label>Itens na Fatura (separar por ponto e vírgula)</label>
+                  <CurrencyListInput
+                    values={c.parte_fatura}
+                    onChange={(values) => updateContribuinte(index, 'parte_fatura', values)}
                     decimalSeparator=","
                     thousandSeparator="."
-                    prefix="R$ "
-                    placeholder="Ex: 5.000,00"
+                    listSeparator=";"
+                    showTotal={true}
+                    placeholder="Ex: 10,50; 20,00; 15,75"
                   />
-                </div>
-                <div className="form-group">
-                  <label>Benefícios (VA/VR)</label>
-                  <CurrencyInput
-                    value={c.beneficio}
-                    onChange={(value) => updateContribuinte(index, 'beneficio', value)}
+                </FormGroup>
+
+                <FormGroup style={{ marginTop: '15px' }}>
+                  <label>Adiantamentos (separar por ponto e vírgula)</label>
+                  <CurrencyListInput
+                    values={c.adianto_fatura}
+                    onChange={(values) => updateContribuinte(index, 'adianto_fatura', values)}
                     decimalSeparator=","
                     thousandSeparator="."
-                    prefix="R$ "
-                    placeholder="Ex: 800,00"
+                    listSeparator=";"
+                    placeholder="Ex: 50,00; 100,00"
                   />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Itens na Fatura (separar por ponto e vírgula)</label>
-                <CurrencyListInput
-                  values={c.parte_fatura}
-                  onChange={(values) => updateContribuinte(index, 'parte_fatura', values)}
-                  decimalSeparator=","
-                  thousandSeparator="."
-                  listSeparator=";"
-                  showTotal={true}
-                  placeholder="Ex: 10,50; 20,00; 15,75"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Adiantamentos (separar por ponto e vírgula)</label>
-                <CurrencyListInput
-                  values={c.adianto_fatura}
-                  onChange={(values) => updateContribuinte(index, 'adianto_fatura', values)}
-                  decimalSeparator=","
-                  thousandSeparator="."
-                  listSeparator=";"
-                  placeholder="Ex: 50,00; 100,00"
-                />
-              </div>
-            </div>
-          ))}
-          <button onClick={addContribuinte} className="btn-add">+ Adicionar Pessoa</button>
-        </div>
+                </FormGroup>
+              </ContributorCard>
+            ))}
+          </ContributorsGrid>
+          <AddButton onClick={addContribuinte}>+ Adicionar Pessoa</AddButton>
+        </>
       )}
     </div>
   );
