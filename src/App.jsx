@@ -5,6 +5,8 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import ShoppingList from './pages/ShoppingList';
+import ShoppingListForm from './pages/ShoppingListForm';
+import ShoppingListUsage from './pages/ShoppingListUsage';
 import BillSplitter from './pages/BillSplitter';
 import RecipeList from './pages/RecipeList';
 import RecipeForm from './pages/RecipeForm';
@@ -28,6 +30,8 @@ function App() {
             
             {/* Public Tools - accessible without login */}
             <Route path="lista-compras" element={<ShoppingList />} />
+            <Route path="lista-compras/edit/:listId" element={<ShoppingListForm />} />
+            <Route path="lista-compras/view/:listId" element={<ShoppingListUsage />} />
             <Route path="dividir-contas" element={<BillSplitter />} />
             <Route path="recipes" element={<RecipeList />} />
             <Route path="recipe-form" element={<RecipeForm />} />

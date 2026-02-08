@@ -1,11 +1,4 @@
 export const TOOLS = [
-  // {
-  //   id: 'shopping-list',
-  //   path: '/lista-compras',
-  //   title: 'Lista de Compras',
-  //   description: 'Organize suas compras do mês, marque itens e nunca mais esqueça o leite!',
-  //   icon: '🛒'
-  // },
   {
     id: 'bill-splitter',
     path: '/dividir-contas',
@@ -26,5 +19,12 @@ export const TOOLS = [
     title: 'Organizador de Refeições',
     description: 'Planeje seu cardápio semanal e gere listas de compras automaticamente.',
     icon: '📅'
+  },
+  {
+    id: 'shopping-list',
+    path: '/lista-compras',
+    title: 'Lista de Compras',
+    description: 'Organize suas compras do mês, marque itens e nunca mais esqueça o leite!',
+    icon: '🛒'
   }
 ];
