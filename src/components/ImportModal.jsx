@@ -127,10 +127,10 @@ const CountBtn = styled.button`
 const ImportModal = ({ 
   isOpen, 
   onClose, 
-  type = 'planning', // 'planning' | 'recipe'
+  type = 'planning', // 'planning' | 'recipe' | 'preferred'
   recipes = [],      // Usado para seleção no tipo 'recipe'
   planningMetadata = [], // [{ title, count }] para o cabeçalho do tipo 'planning'
-  items = [],        // Os ingredientes (usado diretamente para planning)
+  items = [],        // Os ingredientes (usado diretamente para planning e preferred)
   onConfirm 
 }) => {
   const [selectedIndices, setSelectedIndices] = useState([]);
@@ -138,7 +138,7 @@ const ImportModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      if (type === 'planning') {
+      if (type === 'planning' || type === 'preferred') {
         setSelectedIndices(items.map((_, i) => i));
       } else {
         setSelectedIndices([]);
@@ -183,7 +183,7 @@ const ImportModal = ({
     }
   }, [aggregatedRecipeItems, type]);
 
-  const currentItems = type === 'planning' ? items : aggregatedRecipeItems;
+  const currentItems = (type === 'planning' || type === 'preferred') ? items : aggregatedRecipeItems;
 
   const toggleItem = (index) => {
     if (selectedIndices.includes(index)) {
@@ -197,7 +197,7 @@ const ImportModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={type === 'planning' ? "Importar Planejamento" : "Importar Receitas"}
+      title={type === 'planning' ? "Importar Planejamento" : type === 'recipe' ? "Importar Receitas" : "Produtos Preferidos"}
       width="700px"
       footer={
         <>
@@ -244,7 +244,7 @@ const ImportModal = ({
       {currentItems.length > 0 && (
         <>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '10px' }}>
-            {type === 'recipe' ? 'Ingredientes combinados:' : 'Ingredientes do planejamento:'}
+            {type === 'recipe' ? 'Ingredientes combinados:' : type === 'preferred' ? 'Selecione os produtos para importar:' : 'Ingredientes do planejamento:'}
           </p>
           <ItemList>
             {currentItems.map((item, index) => (

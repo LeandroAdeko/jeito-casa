@@ -26,5 +26,12 @@ export const TOOLS = [
     title: 'Lista de Compras',
     description: 'Organize suas compras do mês, marque itens e nunca mais esqueça o leite!',
     icon: '🛒'
+  },
+  {
+    id: 'preferred-products',
+    path: '/produtos-preferidos',
+    title: 'Produtos Preferidos',
+    description: 'Gerencie itens que você compra com frequência e importe-os para suas listas.',
+    icon: '⭐'
   }
 ];

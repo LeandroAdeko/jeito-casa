@@ -69,9 +69,17 @@ const QuickAddRow = styled.form`
 `;
 
 const ItemsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const ItemRow = styled.div`
@@ -155,6 +163,7 @@ const ShoppingListForm = () => {
   
   const [data, setData, syncStatus] = useFirebaseSync('shopping_lists', 'shopping_lists_data', initialData, currentUser);
   const { recipes } = useRecipes(currentUser, { includePublic: true });
+  const [prefData] = useFirebaseSync('preferred_products', 'preferred_products_data', { products: [] }, currentUser);
 
   const [newItem, setNewItem] = useState({ name: '', amount: '', unit: '' });
   const [listName, setListName] = useState('');
@@ -266,6 +275,15 @@ const ShoppingListForm = () => {
       console.error(err);
       alert("Erro ao ler dados do organizador.");
     }
+  };
+
+  const handleImportPreferred = () => {
+    if (!prefData || !prefData.products || prefData.products.length === 0) {
+      alert("Você não tem produtos preferidos cadastrados.");
+      return;
+    }
+    setImportItems(prefData.products);
+    setImportSource('preferred');
   };
 
   const confirmImport = (items) => {
@@ -394,6 +412,10 @@ const ShoppingListForm = () => {
 
             <Button variant="outline" fullWidth onClick={() => setImportSource('recipe')} leftIcon="🍳">
               Importar receita
+            </Button>
+
+            <Button variant="outline" fullWidth onClick={handleImportPreferred} leftIcon="⭐">
+              Importar preferidos
             </Button>
           </ImportGrid>
         </ImportSection>

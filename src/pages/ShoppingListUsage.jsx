@@ -8,6 +8,7 @@ import { Button } from '../components/Button';
 import LoginPrompt from '../components/LoginPrompt';
 import SyncStatusIndicator from '../components/SyncStatusIndicator';
 import ConfirmModal from '../components/ConfirmModal';
+import FinishShoppingModal from '../components/FinishShoppingModal';
 import '../styles/global.css';
 
 const PageContainer = styled.div`
@@ -40,10 +41,18 @@ const HeaderActions = styled.div`
 `;
 
 const ItemsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
   margin-top: 20px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const ItemRow = styled.div`
@@ -152,11 +161,18 @@ const ShoppingListUsage = () => {
     }));
   };
 
-  const confirmFinishShopping = () => {
+  const confirmFinishShopping = (option) => {
     setData(prev => ({
       ...prev,
       lists: prev.lists.map(l => l.id === listId 
-        ? { ...l, items: l.items.filter(i => !i.checked) } 
+        ? { 
+            ...l, 
+            items: option === 'delete_all' 
+              ? [] 
+              : option === 'uncheck_all'
+                ? l.items.map(i => ({ ...i, checked: false }))
+                : l.items.filter(i => !i.checked) // default: delete_checked
+          } 
         : l
       )
     }));
@@ -172,7 +188,7 @@ const ShoppingListUsage = () => {
           <Button onClick={() => navigate('/lista-compras')} variant="secondary" leftIcon="⬅️">Sair</Button>
           <SyncStatusIndicator status={syncStatus} />
           <Button onClick={() => navigate(`/lista-compras/edit/${listId}`)} variant="ghost" leftIcon="✏️">Editar</Button>
-          {activeList.items.some(i => i.checked) && (
+          {activeList.items.length > 0 && (
             <Button variant="danger" size="small" onClick={() => setShowFinishModal(true)}>Finalizar</Button>
           )}
         </HeaderActions>
@@ -212,15 +228,10 @@ const ShoppingListUsage = () => {
         </ItemsContainer>
       </SectionCard>
 
-      <ConfirmModal 
+      <FinishShoppingModal 
         isOpen={showFinishModal}
         onClose={() => setShowFinishModal(false)}
-        onConfirm={confirmFinishShopping}
-        title="Finalizar Compra"
-        message="Deseja remover todos os itens já marcados da lista? Isso manterá apenas o que ainda falta comprar para a próxima vez."
-        confirmLabel="Finalizar e Limpar"
-        confirmVariant="primary"
-        icon="🛒"
+        onFinish={confirmFinishShopping}
       />
     </PageContainer>
   );

@@ -13,6 +13,7 @@ import RecipeForm from './pages/RecipeForm';
 import MealOrganizer from './pages/MealOrganizer';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import PreferredProducts from './pages/PreferredProducts';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             <Route path="recipe-form" element={<RecipeForm />} />
             <Route path="recipe-form/:recipeId" element={<RecipeForm />} />
             <Route path="refeicoes" element={<MealOrganizer />} />
+            <Route path="produtos-preferidos" element={<PreferredProducts />} />
             
             {/* Protected Routes - require login */}
             <Route path="dashboard" element={

@@ -1,112 +1,83 @@
 # 🏠 Jeito de Casa
 
-Uma aplicação web moderna para organização doméstica, desenvolvida com React + Vite.
+Uma aplicação web moderna e resiliente para organização doméstica, desenvolvida com React + Vite e potencializada pelo ecossistema Firebase.
 
 ## 📋 Sobre o Projeto
 
-**Jeito de Casa** é uma suíte de ferramentas para facilitar a gestão da sua casa. O projeto nasceu da necessidade de centralizar tarefas cotidianas como planejamento de refeições, divisão de contas e criação de receitas em uma única plataforma intuitiva e sincronizada.
+**Jeito de Casa** é uma suíte caseira de ferramentas projetada para simplificar a gestão cotidiana. O projeto foca em centralizar o planejamento de refeições, listas de compras e finanças domésticas em uma interface intuitiva, rápida e acessível de qualquer dispositivo.
 
-## ✨ Funcionalidades
+## ✨ Funcionalidades Principais
 
-### 🔐 Autenticação e Sincronização
-- Login seguro via Email/Senha ou Google (Firebase Auth)
-- Sincronização em tempo real entre dispositivos via Firestore
-- Dados persistentes vinculados à conta do usuário
+### 🔐 Autenticação e Sincronização em Tempo Real
+- **Acesso Seguro**: Login via Email/Senha ou Google (Firebase Auth).
+- **Eco-sistema Cloud**: Seus dados são sincronizados instantaneamente entre dispositivos via Cloud Firestore.
+- **Offline-First**: Continue consultando e editando suas listas mesmo sem conexão; as mudanças serão sincronizadas assim que você voltar online.
 
-### 🛒 Lista de Compras
-- Gerenciamento de itens com quantidade e unidade
-- **Importação inteligente:** Adicione ingredientes diretamente de suas receitas ou do seu planejamento no Organizador de Refeições
-- Interface interativa para marcar itens durante a compra
-- Limpeza automática de itens comprados ao finalizar
-
-### 🍳 Criador de Receitas
-- Estruture ingredientes com quantidade, unidade e nome
-- Adicione passos detalhados de preparo
-- Exporte receitas em formato JSON
-- Visualize em Markdown formatado e copie facilmente
+### 🛒 Lista de Compras Dinâmica
+- **Listas Nomeados**: Crie e gerencie múltiplas listas de compras (ex: "Semanal", "Natal", "Churrasco").
+- **Importação Inteligente**: 
+  - **Do Planejamento**: Puxe automaticamente todos os ingredientes do seu cronograma de refeições.
+  - **De Receitas**: Selecione receitas específicas e ajuste as quantidades (+/-) antes de importar.
+  - **De Preferidos**: Selecione seus produtos preferidos de forma simples.
+- **Modo Supermercado ("Zen")**: Interface focada no essencial para evitar cliques acidentais enquanto você percorre os corredores.
+- **Finalização Flexível**: Escolha entre limpar apenas itens comprados, desmarcar tudo ou apagar a lista completa.
 
 ### 📅 Organizador de Refeições
-- Planejamento dinâmico de dias
-- Adicione múltiplas refeições por dia
-- **Cálculo inteligente de ingredientes:** Informe o número de pessoas e o sistema calcula os lotes necessários automaticamente
-- Arredondamento inteligente para evitar falta de ingredientes
+- **Layout Horizontal**: Visualização fluida e responsiva dos dias de planejamento.
+- **Cálculo de Lotes**: Informe o número de pessoas e o app calcula automaticamente quantos lotes de cada receita você precisa preparar.
+- **Integração Total**: Gere sua lista de compras com um clique a partir do que foi planejado.
+
+### 🍳 Criador de Receitas
+- **Estruturação Completa**: Ingredientes com unidades padronizadas e passos detalhados.
+- **Markdown Preview**: Visualize como sua receita ficará formatada antes de salvar.
+- **Portabilidade**: Importe e exporte receitas em JSON para backup ou compartilhamento manual.
 
 ### 💸 Calculadora de Contas
-- Divida contas de forma igualitária ou proporcional à renda de cada morador
-- Visualize resultados detalhados por pessoa
-- Salve configurações de contribuintes para uso recorrente
+- **Divisão Proporcional**: Calcule quem deve pagar o quê baseado na renda individual, garantindo uma divisão justa em contas compartilhadas.
+- **Modo Igualitário**: Para divisões simples entre todos os moradores.
 
-## 🛠️ Tecnologias Utilizadas
+## 🎨 Design e User Experience
 
-- **React 18** - Framework frontend
-- **Vite** - Build tool ultrarrápida
-- **Firebase** - Authentication e Firestore (Banco de dados NoSQL)
-- **styled-components** - CSS-in-JS para design moderno
-- **React Router 6** - Roteamento com suporte a rotas protegidas
-- **react-markdown** - Renderização de receitas e notas
+- **Navegação Superior**: Navbar sticky com menu hamburger para mobile e dropdown de perfil.
+- **Standardized Headers**: Cabeçalhos modernos e consistentes com ícones expressivos e ações rápidas.
+- **Sistema de Design Atômico**: Componentes de interface (Botões, Inputs, Cards) totalmente padronizados para uma experiência visual coesa.
+- **Modais de Elite**: Substituição de alertas nativos por diálogos de confirmação elegantes e contextuais.
 
-## 🎨 Design e UI
-
-- **Interface Premium:** Design limpo, bordas suaves e micro-interações
-- **Standardized Headers:** Sistema de cabeçalhos sem bordas e ação primária destacada
-- **Navbar Superior:** Navegação intuitiva adaptada para desktop e mobile
-- **Atomic Buttons:** Sistema de botões padronizado (Variants: primary, secondary, danger, ghost)
-- **Tema Híbrido:** Suporte visual para clareza e conforto
-
-## 🚀 Como Executar
-
-### Pré-requisitos
-- Node.js (versão 18+)
-- Conta no Firebase (para as chaves de configuração)
+## 🚀 Guia de Início Rápido
 
 ### Instalação
 
 ```bash
-# Clone o repositório
+# Clone e entre na pasta
 git clone https://github.com/LeandroAdeko/jeito-casa.git
-
-# Entre no diretório
 cd jeito-casa
 
 # Instale as dependências
 npm install
 
-# Configure as variáveis de ambiente
-# Crie um arquivo .env com suas chaves do Firebase
-# VITE_FIREBASE_API_KEY=...
+# Configure as variáveis de ambiente (.env)
+# VITE_FIREBASE_API_KEY=sua_chave
+# VITE_FIREBASE_AUTH_DOMAIN=seu_dominio
+# ...etc
 
-# Execute em modo de desenvolvimento
+# Rode o servidor de dev
 npm run dev
 ```
 
-## 📁 Estrutura do Projeto
+## 📁 Estrutura Técnica
 
 ```
 jeito-casa/
 ├── src/
-│   ├── components/       # Componentes atômicos e estruturais
-│   │   ├── Button/       # Sistema de botões padronizado
-│   │   ├── Input/        # Inputs, TextAreas e Selects estilizados
-│   │   ├── Navbar.jsx    # Navegação superior
-│   │   └── SectionCard.jsx
-│   ├── contexts/         # Contextos (AuthContext, etc.)
-│   ├── hooks/            # Hooks customizados (useFirebaseSync, etc.)
-│   ├── pages/            # Páginas da aplicação
-│   │   ├── Login.jsx
-│   │   ├── ShoppingList.jsx
-│   │   ├── MealOrganizer.jsx
-│   │   └── BillSplitter.jsx
-│   ├── config/           # Configurações do Firebase e Ferramentas
-│   ├── styles/           # Tokens e estilos globais
-│   ├── App.jsx           # Roteamento e Provedores
-│   └── main.jsx
-└── public/               # Ativos estáticos
+│   ├── components/      # Componentes atômicos (Button, Input, Modal)
+│   ├── contexts/        # Gerenciamento de estado Global (Auth)
+│   ├── hooks/           # Lógica reutilizável (useFirebaseSync, useRecipes)
+│   ├── pages/           # Telas da aplicação (Dashboard, ShoppingList, etc)
+│   ├── config/          # Centralização de configurações e chaves
+│   └── styles/          # Design System e Tokens Globais
+└── firestore.rules      # Regras de segurança do banco de dados
 ```
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT.
 
 ---
 
-**Jeito de Casa** - Organização doméstica sem complicações. 🏡✨
+**Jeito de Casa** - A inteligência que faltava na sua rotina doméstica. 🏡✨

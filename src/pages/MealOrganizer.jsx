@@ -61,8 +61,9 @@ const PeopleCounter = styled.div`
 
 const DaysContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 20px;
+  flex-wrap: wrap;
 `;
 
 const AddDayButton = styled.button`
