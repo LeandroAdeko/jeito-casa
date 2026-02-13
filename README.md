@@ -4,68 +4,60 @@ Uma aplicação web moderna para organização doméstica, desenvolvida com Reac
 
 ## 📋 Sobre o Projeto
 
-**Jeito de Casa** é uma suíte de ferramentas para facilitar a gestão da sua casa. O projeto nasceu da necessidade de centralizar tarefas cotidianas como planejamento de refeições, divisão de contas e criação de receitas em uma única plataforma intuitiva.
+**Jeito de Casa** é uma suíte de ferramentas para facilitar a gestão da sua casa. O projeto nasceu da necessidade de centralizar tarefas cotidianas como planejamento de refeições, divisão de contas e criação de receitas em uma única plataforma intuitiva e sincronizada.
 
 ## ✨ Funcionalidades
 
+### 🔐 Autenticação e Sincronização
+- Login seguro via Email/Senha ou Google (Firebase Auth)
+- Sincronização em tempo real entre dispositivos via Firestore
+- Dados persistentes vinculados à conta do usuário
+
+### 🛒 Lista de Compras
+- Gerenciamento de itens com quantidade e unidade
+- **Importação inteligente:** Adicione ingredientes diretamente de suas receitas ou do seu planejamento no Organizador de Refeições
+- Interface interativa para marcar itens durante a compra
+- Limpeza automática de itens comprados ao finalizar
+
 ### 🍳 Criador de Receitas
-- Crie e gerencie suas receitas culinárias
 - Estruture ingredientes com quantidade, unidade e nome
 - Adicione passos detalhados de preparo
 - Exporte receitas em formato JSON
-- Visualize em Markdown formatado
-- Copie facilmente para compartilhar
+- Visualize em Markdown formatado e copie facilmente
 
 ### 📅 Organizador de Refeições
-- Planejamento dinâmico de dias (sem limite fixo de semana)
+- Planejamento dinâmico de dias
 - Adicione múltiplas refeições por dia
-- Carregue receitas salvas em JSON
-- **Cálculo inteligente de ingredientes:**
-  - Informe o número de pessoas
-  - Sistema calcula automaticamente os lotes necessários
-  - Arredonda para cima para evitar falta de ingredientes
-- **Lista de compras automática:**
-  - Agrega ingredientes de todas as receitas
-  - Checkbox interativo para marcar itens comprados
-  - Exportação em Markdown
-- **Sugestões de porções extras:**
-  - Mostra quando haverá sobras
-  - Ajuda no reaproveitamento de alimentos
+- **Cálculo inteligente de ingredientes:** Informe o número de pessoas e o sistema calcula os lotes necessários automaticamente
+- Arredondamento inteligente para evitar falta de ingredientes
 
 ### 💸 Calculadora de Contas
-- Divida contas de forma justa entre moradores
-- Dois modos de divisão:
-  - **Igualitária:** Todos pagam o mesmo valor
-  - **Proporcional:** Baseado na renda de cada pessoa
-- Adicione múltiplos contribuintes
-- Carregue e salve configurações em JSON
+- Divida contas de forma igualitária ou proporcional à renda de cada morador
 - Visualize resultados detalhados por pessoa
+- Salve configurações de contribuintes para uso recorrente
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **React 18** - Biblioteca principal
-- **Vite** - Build tool e dev server
-- **React Router DOM** - Roteamento
-- **styled-components** - Estilização de componentes
-- **react-markdown** - Renderização de Markdown
+- **React 18** - Framework frontend
+- **Vite** - Build tool ultrarrápida
+- **Firebase** - Authentication e Firestore (Banco de dados NoSQL)
+- **styled-components** - CSS-in-JS para design moderno
+- **React Router 6** - Roteamento com suporte a rotas protegidas
+- **react-markdown** - Renderização de receitas e notas
 
-## 🎨 Design
+## 🎨 Design e UI
 
-- **Tema Claro/Escuro:** Alternância suave entre modos
-- **Componentes Reutilizáveis:**
-  - `SectionCard` - Cards padronizados
-  - `CopyButton` - Botão de cópia com feedback
-  - `FileUpload` - Upload de arquivos JSON
-  - `DownloadJsonButton` - Download de dados
-  - `DayCard` - Cards de planejamento de dias
-- **Layout Responsivo:** Grid adaptativo para diferentes telas
-- **Sidebar Colapsável:** Navegação otimizada
+- **Interface Premium:** Design limpo, bordas suaves e micro-interações
+- **Standardized Headers:** Sistema de cabeçalhos sem bordas e ação primária destacada
+- **Navbar Superior:** Navegação intuitiva adaptada para desktop e mobile
+- **Atomic Buttons:** Sistema de botões padronizado (Variants: primary, secondary, danger, ghost)
+- **Tema Híbrido:** Suporte visual para clareza e conforto
 
 ## 🚀 Como Executar
 
 ### Pré-requisitos
-- Node.js (versão 16+)
-- npm ou yarn
+- Node.js (versão 18+)
+- Conta no Firebase (para as chaves de configuração)
 
 ### Instalação
 
@@ -79,66 +71,42 @@ cd jeito-casa
 # Instale as dependências
 npm install
 
+# Configure as variáveis de ambiente
+# Crie um arquivo .env com suas chaves do Firebase
+# VITE_FIREBASE_API_KEY=...
+
 # Execute em modo de desenvolvimento
 npm run dev
 ```
-
-O projeto estará disponível em `http://localhost:5173`
 
 ## 📁 Estrutura do Projeto
 
 ```
 jeito-casa/
 ├── src/
-│   ├── components/       # Componentes reutilizáveis
-│   │   ├── CopyButton.jsx
-│   │   ├── DayCard.jsx
-│   │   ├── DownloadJsonButton.jsx
-│   │   ├── FileUpload.jsx
-│   │   ├── Footer.jsx
-│   │   ├── Layout.jsx
-│   │   ├── SectionCard.jsx
-│   │   ├── Sidebar.jsx
-│   │   └── SidebarIcon.jsx
+│   ├── components/       # Componentes atômicos e estruturais
+│   │   ├── Button/       # Sistema de botões padronizado
+│   │   ├── Input/        # Inputs, TextAreas e Selects estilizados
+│   │   ├── Navbar.jsx    # Navegação superior
+│   │   └── SectionCard.jsx
+│   ├── contexts/         # Contextos (AuthContext, etc.)
+│   ├── hooks/            # Hooks customizados (useFirebaseSync, etc.)
 │   ├── pages/            # Páginas da aplicação
-│   │   ├── BillSplitter.jsx
-│   │   ├── Dashboard.jsx
+│   │   ├── Login.jsx
+│   │   ├── ShoppingList.jsx
 │   │   ├── MealOrganizer.jsx
-│   │   └── RecipeCreator.jsx
-│   ├── config/           # Configurações
-│   │   └── tools.js      # Definição centralizada de ferramentas
-│   ├── styles/           # Estilos CSS
-│   │   ├── global.css
-│   │   ├── layout.css
-│   │   ├── dashboard.css
-│   │   ├── meal-organizer.css
-│   │   └── bill-splitter.css
-│   ├── App.jsx           # Componente raiz
-│   └── main.jsx          # Entry point
-└── recipes/              # Receitas de exemplo (JSON)
+│   │   └── BillSplitter.jsx
+│   ├── config/           # Configurações do Firebase e Ferramentas
+│   ├── styles/           # Tokens e estilos globais
+│   ├── App.jsx           # Roteamento e Provedores
+│   └── main.jsx
+└── public/               # Ativos estáticos
 ```
-
-## 🎯 Roadmap
-
-- [ ] Autenticação de usuários
-- [ ] Persistência de dados (LocalStorage/Backend)
-- [ ] Modo de impressão para listas
-- [ ] Compartilhamento de receitas
-- [ ] Calculadora de conversão de unidades
-- [ ] Sugestões de receitas baseadas em ingredientes disponíveis
-
-## 👥 Contribuindo
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests.
 
 ## 📄 Licença
 
 Este projeto está sob a licença MIT.
 
-## 🙏 Créditos
-
-Criado por [Leandro Silva](https://www.linkedin.com/in/leandrovlsilva/) + Antigravity
-
 ---
 
-**Jeito de Casa** - Penando para organizar sua casa? A gente dá um jeito! 🏡✨
+**Jeito de Casa** - Organização doméstica sem complicações. 🏡✨
